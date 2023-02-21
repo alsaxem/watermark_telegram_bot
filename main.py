@@ -166,12 +166,20 @@ def handle_text(message):
     elif 0 in amogus[message.chat.id]:
         add_parameters(message)
     elif message.text == "Мои настройки":
-        pass
+        send_settings(message.chat.id)
     elif message.text == 'Изменить настройки':
         pass
     else:
         text = "Отправь фото для наложения водяного знака"
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
+
+
+def send_settings(user_id):
+    settings = ""
+    for setting_name, setting_value in amogus[user_id].items():
+        if setting_name != "watermark_id":
+            settings += f"{setting_name}: {setting_value}\n"
+    bot.send_message(chat_id=user_id, text=settings)
 
 
 def add_parameters(message):

@@ -24,7 +24,7 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    text = "Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком для подтверждения авторства."
+    text = "Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком."
     amogus[message.chat.id] = {
         "watermark_id": empty_value,
         "position": empty_value,
@@ -37,8 +37,7 @@ def start(message):
 
 
 def request_watermark_photo(message):
-    text = "Отправьте водяной знак для ваших будущих фото. Обычно это адрес сайта, логотип компании или контакт " \
-           "автора, но вы можете использовать любое изображение."
+    text = "Отправьте водяной знак для ваших будущих фото. Вы можете использовать любое изображение."
     bot.send_message(chat_id=message.chat.id, text=text)
     bot.register_next_step_handler(message, set_watermark_photo)
 
@@ -77,7 +76,7 @@ def set_watermark_photo(message):
         add_parameters(message)
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуй еще раз."
+        text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=message.chat.id, text=text)
         bot.register_next_step_handler(message, request_opacity)
 
@@ -89,9 +88,7 @@ def set_position(call):
         add_parameters(call.message)
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуй еще раз."
-        if amogus[call.message.chat.id]["watermark_id"] == empty_value:
-            text = "Сначала необходимо отправить водяной знак"
+        text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=call.message.chat.id, text=text)
         bot.register_next_step_handler(call.message, request_watermark_position)
 
@@ -103,7 +100,7 @@ def set_scale(call):
         add_parameters(call.message)
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуй еще раз."
+        text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=call.message.chat.id, text=text)
         bot.register_next_step_handler(call.message, request_scale)
 
@@ -115,7 +112,7 @@ def set_opacity(call):
         add_parameters(call.message)
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуй еще раз."
+        text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=call.message.chat.id, text=text)
         bot.register_next_step_handler(call.message, request_opacity)
 
@@ -127,7 +124,7 @@ def set_padding(message):
         save_dict()
         add_parameters(message)
     else:
-        bot.send_message(message.chat.id, "Отступ необходимо указывать в виде целого числа! Попробуй еще раз.")
+        bot.send_message(message.chat.id, "Отступ необходимо указывать в виде целого числа! Попробуйте еще раз.")
         bot.register_next_step_handler(message, request_padding)
 
 
@@ -174,7 +171,7 @@ def handle_text(message):
     elif message.text == 'Изменить настройки':
         request_change_setting(message.chat.id)
     else:
-        text = "Отправь фото для наложения водяного знака"
+        text = "Отправьте фото для наложения водяного знака."
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
 
 
@@ -209,7 +206,7 @@ def add_parameters(message):
     elif amogus[message.chat.id]["padding"] == empty_value:
         request_padding(message)
     else:
-        text = "Все параметры указаны. Отправь фото, которое хочешь защитить"
+        text = "Все параметры указаны. Отправьте фото, которое хочешь защитить"
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
 
 

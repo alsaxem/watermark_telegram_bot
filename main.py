@@ -9,6 +9,7 @@ from config import (
     temp_file_path,
     photos_path,
     save_path,
+    settings,
     position_values,
     scale_values,
     opacity_values,
@@ -137,6 +138,8 @@ def callback_inline_position(call):
         set_scale(call)
     elif call.data in opacity_values:
         set_opacity(call)
+    elif call.data in settings:
+        change_setting(call)
 
 
 def get_reply_keyboard():
@@ -168,7 +171,7 @@ def handle_text(message):
     elif message.text == "Мои настройки":
         send_settings(message.chat.id)
     elif message.text == 'Изменить настройки':
-        pass
+        request_change_setting(message.chat.id)
     else:
         text = "Отправь фото для наложения водяного знака"
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
@@ -180,6 +183,17 @@ def send_settings(user_id):
         if setting_name != "watermark_id":
             settings += f"{setting_name}: {setting_value}\n"
     bot.send_message(chat_id=user_id, text=settings)
+
+
+def request_change_setting(user_id):
+    text = "Выберете параметр, который вы хотите изменить:"
+    keyboard = Keyboa(items=settings, items_in_row=1)
+    bot.send_message(chat_id=user_id, text=text, reply_markup=keyboard())
+
+
+def change_setting(call):
+    amogus[call.message.chat.id][call.data] = 0
+    add_parameters(call.message)
 
 
 def add_parameters(message):

@@ -9,6 +9,7 @@ from config import (
     temp_file_path,
     photos_path,
     save_path,
+    empty_value,
     settings,
     position_values,
     scale_values,
@@ -25,11 +26,11 @@ bot = telebot.TeleBot(token)
 def start(message):
     text = "Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком для подтверждения авторства."
     amogus[message.chat.id] = {
-        "watermark_id": 0,
-        "position": 0,
-        "scale": 0,
-        "opacity": 0,
-        "padding": 0}
+        "watermark_id": empty_value,
+        "position": empty_value,
+        "scale": empty_value,
+        "opacity": empty_value,
+        "padding": empty_value}
     bot.send_message(chat_id=message.chat.id, text=text)
     save_dict()
     request_watermark_photo(message)
@@ -89,7 +90,7 @@ def set_position(call):
     except Exception as e:
         print(e)
         text = "Что-то пошло не так. Попробуй еще раз."
-        if amogus[call.message.chat.id]["watermark_id"] == 0:
+        if amogus[call.message.chat.id]["watermark_id"] == empty_value:
             text = "Сначала необходимо отправить водяной знак"
         bot.send_message(chat_id=call.message.chat.id, text=text)
         bot.register_next_step_handler(call.message, request_watermark_position)
@@ -166,7 +167,7 @@ def process_photo(photo_path, watermark_path, user_id):
 def handle_text(message):
     if message.chat.id not in amogus:
         start(message)
-    elif 0 in amogus[message.chat.id]:
+    elif empty_value in amogus[message.chat.id]:
         add_parameters(message)
     elif message.text == "Мои настройки":
         send_settings(message.chat.id)
@@ -178,11 +179,11 @@ def handle_text(message):
 
 
 def send_settings(user_id):
-    settings = ""
+    user_settings = ""
     for setting_name, setting_value in amogus[user_id].items():
         if setting_name != "watermark_id":
-            settings += f"{setting_name}: {setting_value}\n"
-    bot.send_message(chat_id=user_id, text=settings)
+            user_settings += f"{setting_name}: {setting_value}\n"
+    bot.send_message(chat_id=user_id, text=user_settings)
 
 
 def request_change_setting(user_id):
@@ -192,20 +193,20 @@ def request_change_setting(user_id):
 
 
 def change_setting(call):
-    amogus[call.message.chat.id][call.data] = 0
+    amogus[call.message.chat.id][call.data] = empty_value
     add_parameters(call.message)
 
 
 def add_parameters(message):
-    if amogus[message.chat.id]["watermark_id"] == 0:
+    if amogus[message.chat.id]["watermark_id"] == empty_value:
         request_watermark_photo(message)
-    elif amogus[message.chat.id]["position"] == 0:
+    elif amogus[message.chat.id]["position"] == empty_value:
         request_watermark_position(message)
-    elif amogus[message.chat.id]["scale"] == 0:
+    elif amogus[message.chat.id]["scale"] == empty_value:
         request_scale(message)
-    elif amogus[message.chat.id]["opacity"] == 0:
+    elif amogus[message.chat.id]["opacity"] == empty_value:
         request_opacity(message)
-    elif amogus[message.chat.id]["padding"] == 0:
+    elif amogus[message.chat.id]["padding"] == empty_value:
         request_padding(message)
     else:
         text = "Все параметры указаны. Отправь фото, которое хочешь защитить"
@@ -216,7 +217,7 @@ def add_parameters(message):
 def handle_docs_photo(message):
     if message.chat.id not in amogus:
         start(message)
-    elif 0 in amogus[message.chat.id].values():
+    elif empty_value in amogus[message.chat.id].values():
         add_parameters(message)
     else:
         try:

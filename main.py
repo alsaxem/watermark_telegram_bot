@@ -1,4 +1,5 @@
 import pickle
+from telebot import types
 import wmbed
 import telebot
 import os
@@ -138,6 +139,14 @@ def callback_inline_position(call):
         set_opacity(call)
 
 
+def get_reply_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    button1 = types.KeyboardButton('Мои настройки')
+    button2 = types.KeyboardButton('Изменить настройки')
+    keyboard.add(button1, button2)
+    return keyboard
+
+
 def process_photo(photo_path, watermark_path, user_id):
     wmbed.create_marked_image(
         image_path=photo_path,
@@ -156,9 +165,13 @@ def handle_text(message):
         start(message)
     elif 0 in amogus[message.chat.id]:
         add_parameters(message)
+    elif message.text == "Мои настройки":
+        pass
+    elif message.text == 'Изменить настройки':
+        pass
     else:
-        text = "Отправь фото для наложения водяного знака."
-        bot.send_message(chat_id=message.chat.id, text=text)
+        text = "Отправь фото для наложения водяного знака"
+        bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
 
 
 def add_parameters(message):
@@ -174,7 +187,7 @@ def add_parameters(message):
         request_padding(message)
     else:
         text = "Все параметры указаны. Отправь фото, которое хочешь защитить"
-        bot.send_message(chat_id=message.chat.id, text=text)
+        bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
 
 
 @bot.message_handler(content_types=['photo'])
@@ -226,10 +239,11 @@ if not os.path.exists(temp_file_path):
 if not os.path.exists(os.path.join(temp_file_path, photos_path)):
     os.makedirs(os.path.join(temp_file_path, photos_path))
 
-message_text = 'Привет, я снова работаю!'
+
 for user_id, user_data in amogus.items():
     try:
-        bot.send_message(chat_id=user_id, text=message_text)
+        message_text = 'Привет, я снова работаю!'
+        bot.send_message(chat_id=user_id, text=message_text, reply_markup=get_reply_keyboard())
     except Exception as a:
         print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})')
 

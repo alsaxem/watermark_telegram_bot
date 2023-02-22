@@ -19,7 +19,7 @@ def apply_threshold(value, threshold):
         return value
 
 
-def embed_watermark(image, watermark, position, scale, opacity, padding):
+def embed_positional_watermark(image, watermark, position, scale, opacity, padding):
     image_height, image_width = image.shape[:2]
     watermark = scale_watermark(watermark, (image_width, image_height), scale)
     watermark_height, watermark_width = watermark.shape[:2]
@@ -52,13 +52,20 @@ def embed_watermark(image, watermark, position, scale, opacity, padding):
         else:
             horizontal_bounds = (0, image_width - padding)
             watermark = watermark[..., watermark_width + padding - image_width]
-    region_of_interest = image[vertical_bounds[0]:vertical_bounds[1], horizontal_bounds[0]:horizontal_bounds[1]]
+    marked_image = embed(image, watermark, horizontal_bounds, vertical_bounds, opacity)
+    return marked_image
+
+
+def embed(image, watermark, horizontal_bounds, vertical_bounds, opacity):
+    hb1, hb2 = horizontal_bounds
+    vb1, vb2 = vertical_bounds
+    region_of_interest = image[vb1:vb2, hb1:hb2]
     marked_region_of_interest = cv2.addWeighted(region_of_interest, (1 - opacity), watermark, opacity, 0)
-    image[vertical_bounds[0]:vertical_bounds[1], horizontal_bounds[0]:horizontal_bounds[1]] = marked_region_of_interest
+    image[vb1:vb2, hb1:hb2] = marked_region_of_interest
     return image
 
 
-def create_marked_image(
+def create_image_with_positional_watermark(
         image_path,
         watermark_path,
         save_path,
@@ -68,5 +75,5 @@ def create_marked_image(
         padding=0):
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
-    marked_image = embed_watermark(image, watermark, position, scale, opacity, padding)
+    marked_image = embed_positional_watermark(image, watermark, position, scale, opacity, padding)
     cv2.imwrite(save_path, marked_image)

@@ -123,7 +123,7 @@ def set_padding(call):
 
 
 def set_parameter(message, column, data):
-    bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=None)
+    bot.delete_message(message.chat.id, message.message_id)
     amogus[message.chat.id][column] = data
     save_dict()
     add_parameters(message)
@@ -185,7 +185,7 @@ def request_change_setting(user_id):
 
 @bot.callback_query_handler(func=lambda call: call.data in settings)
 def change_setting(call):
-    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
+    bot.delete_message(call.message.chat.id, call.message.message_id)
     amogus[call.message.chat.id][call.data] = empty_value
     add_parameters(call.message)
 

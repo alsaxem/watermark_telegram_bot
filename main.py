@@ -85,57 +85,53 @@ def set_watermark_photo(message):
 @bot.callback_query_handler(func=lambda call: call.data in position_values)
 def set_position(call):
     try:
-        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        amogus[call.message.chat.id]["position"] = call.data
-        save_dict()
-        add_parameters(call.message)
+        set_parameter(call.message, column="position", data=call.data)
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуйте еще раз."
-        bot.send_message(chat_id=call.message.chat.id, text=text)
+        process_exception(call.message)
         bot.register_next_step_handler(call.message, request_watermark_position)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in scale_values)
 def set_scale(call):
     try:
-        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        amogus[call.message.chat.id]["scale"] = float(call.data[1:])
-        save_dict()
-        add_parameters(call.message)
+        set_parameter(call.message, column="scale", data=float(call.data[1:]))
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуйте еще раз."
-        bot.send_message(chat_id=call.message.chat.id, text=text)
+        process_exception(call.message)
         bot.register_next_step_handler(call.message, request_scale)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in opacity_values)
 def set_opacity(call):
     try:
-        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        amogus[call.message.chat.id]["opacity"] = float(call.data)
-        save_dict()
-        add_parameters(call.message)
+        set_parameter(call.message, column="opacity", data=float(call.data))
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуйте еще раз."
-        bot.send_message(chat_id=call.message.chat.id, text=text)
+        process_exception(call.message)
         bot.register_next_step_handler(call.message, request_opacity)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in padding_values)
 def set_padding(call):
     try:
-        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-        amogus[call.message.chat.id]["padding"] = float(call.data[:-1]) / 100
-        save_dict()
-        add_parameters(call.message)
+        set_parameter(call.message, column="padding", data=float(call.data[:-1]) / 100)
     except Exception as e:
         print(e)
-        text = "Что-то пошло не так. Попробуйте еще раз."
-        bot.send_message(chat_id=call.message.chat.id, text=text)
+        process_exception(call.message)
         bot.register_next_step_handler(call.message, request_padding)
+
+
+def set_parameter(message, column, data):
+    bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=None)
+    amogus[message.chat.id][column] = data
+    save_dict()
+    add_parameters(message)
+
+
+def process_exception(message):
+    text = "Что-то пошло не так. Попробуйте еще раз."
+    bot.send_message(chat_id=message.chat.id, text=text)
 
 
 def get_reply_keyboard():

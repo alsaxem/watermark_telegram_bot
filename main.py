@@ -82,6 +82,7 @@ def set_watermark_photo(message):
         bot.register_next_step_handler(message, request_opacity)
 
 
+@bot.callback_query_handler(func=lambda call: call.data in position_values)
 def set_position(call):
     try:
         amogus[call.message.chat.id]["position"] = call.data
@@ -94,6 +95,7 @@ def set_position(call):
         bot.register_next_step_handler(call.message, request_watermark_position)
 
 
+@bot.callback_query_handler(func=lambda call: call.data in scale_values)
 def set_scale(call):
     try:
         amogus[call.message.chat.id]["scale"] = float(call.data[1:])
@@ -106,6 +108,7 @@ def set_scale(call):
         bot.register_next_step_handler(call.message, request_scale)
 
 
+@bot.callback_query_handler(func=lambda call: call.data in opacity_values)
 def set_opacity(call):
     try:
         amogus[call.message.chat.id]["opacity"] = float(call.data)
@@ -118,6 +121,7 @@ def set_opacity(call):
         bot.register_next_step_handler(call.message, request_opacity)
 
 
+@bot.callback_query_handler(func=lambda call: call.data in padding_values)
 def set_padding(call):
     try:
         amogus[call.message.chat.id]["padding"] = float(call.data[:-1]) / 100
@@ -128,20 +132,6 @@ def set_padding(call):
         text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=call.message.chat.id, text=text)
         bot.register_next_step_handler(call.message, request_padding)
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_inline_position(call):
-    if call.data in position_values:
-        set_position(call)
-    elif call.data in scale_values:
-        set_scale(call)
-    elif call.data in opacity_values:
-        set_opacity(call)
-    elif call.data in padding_values:
-        set_padding(call)
-    elif call.data in settings:
-        change_setting(call)
 
 
 def get_reply_keyboard():
@@ -193,6 +183,7 @@ def request_change_setting(user_id):
     bot.send_message(chat_id=user_id, text=text, reply_markup=keyboard())
 
 
+@bot.callback_query_handler(func=lambda call: call.data in settings)
 def change_setting(call):
     amogus[call.message.chat.id][call.data] = empty_value
     add_parameters(call.message)

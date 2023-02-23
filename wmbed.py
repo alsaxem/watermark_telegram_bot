@@ -12,17 +12,25 @@ def scale_watermark(watermark, image_size, relative_scale):
     return resized
 
 
+def get_central_bounds(image_size, watermark_size):
+    image_width, image_height = image_size
+    watermark_width, watermark_height = watermark_size
+    image_center_x = image_width // 2
+    image_center_y = image_height // 2
+    left_bound = max(image_center_x - watermark_width // 2, 0)
+    right_bound = min(left_bound + watermark_width, image_width)
+    top_bound = max(image_center_y - watermark_height // 2, 0)
+    bottom_bound = min(top_bound + watermark_height, image_height)
+    return (left_bound, right_bound), (top_bound, bottom_bound)
+
+
 def embed_central_watermark(image, watermark, scale, opacity):
     image_height, image_width = image.shape[:2]
     watermark = scale_watermark(watermark, (image_width, image_height), scale)
     watermark_height, watermark_width = watermark.shape[:2]
-    image_center_x = image_width // 2
-    image_center_y = image_height // 2
-    left_bound = image_center_x - watermark_width // 2
-    right_bound = left_bound + watermark_width
-    top_bound = image_center_y - watermark_height // 2
-    bottom_bound = top_bound + watermark_height
-    marked_image = embed(image, watermark, (left_bound, right_bound), (top_bound, bottom_bound), opacity)
+    horizontal_bounds, vertical_bounds = get_central_bounds(
+        (image_width, image_height), (watermark_width, watermark_height))
+    marked_image = embed(image, watermark, horizontal_bounds, vertical_bounds, opacity)
     return marked_image
 
 

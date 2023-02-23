@@ -48,13 +48,24 @@ def embed_positional_watermark(image, watermark, position, scale, opacity, relat
     return marked_image
 
 
-def embed(image, watermark, horizontal_bounds, vertical_bounds, opacity):
+def crop(image, horizontal_bounds, vertical_bounds):
     hb1, hb2 = horizontal_bounds
     vb1, vb2 = vertical_bounds
-    region_of_interest = image[vb1:vb2, hb1:hb2]
-    marked_region_of_interest = cv2.addWeighted(region_of_interest, (1 - opacity), watermark, opacity, 0)
-    image[vb1:vb2, hb1:hb2] = marked_region_of_interest
+    return image[vb1:vb2, hb1:hb2]
+
+
+def paste(image, insert, horizontal_bounds, vertical_bounds):
+    hb1, hb2 = horizontal_bounds
+    vb1, vb2 = vertical_bounds
+    image[vb1:vb2, hb1:hb2] = insert
     return image
+
+
+def embed(image, watermark, horizontal_bounds, vertical_bounds, opacity):
+    region_of_interest = crop(image, horizontal_bounds, vertical_bounds)
+    marked_region_of_interest = cv2.addWeighted(region_of_interest, (1 - opacity), watermark, opacity, 0)
+    marked_image = paste(image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
+    return marked_image
 
 
 def create_image_with_central_watermark(

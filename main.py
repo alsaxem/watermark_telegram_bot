@@ -14,6 +14,7 @@ from config import (
     position_values,
     scale_values,
     opacity_values,
+    padding_values,
     users_file_path,
 )
 
@@ -61,9 +62,9 @@ def request_opacity(message):
 
 
 def request_padding(message):
-    text = "Укажите отступ водяного знака от края изображения в пикселях:"
-    bot.send_message(chat_id=message.chat.id, text=text)
-    bot.register_next_step_handler(message, set_padding)
+    text = "Укажите отступ водяного знака от края изображения в процентах:"
+    keyboard = Keyboa(items=padding_values, items_in_row=5)
+    bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 
 def set_watermark_photo(message):
@@ -117,15 +118,16 @@ def set_opacity(call):
         bot.register_next_step_handler(call.message, request_opacity)
 
 
-def set_padding(message):
-    if message.text.isdigit():
-        amogus[message.chat.id]["padding"] = int(message.text)
-        bot.send_message(message.chat.id, "Сохранен отступ в " + message.text + " пикселей")
+def set_padding(call):
+    try:
+        amogus[call.message.chat.id]["padding"] = float(call.data[:-1])/100
         save_dict()
-        add_parameters(message)
-    else:
-        bot.send_message(message.chat.id, "Отступ необходимо указывать в виде целого числа! Попробуйте еще раз.")
-        bot.register_next_step_handler(message, request_padding)
+        add_parameters(call.message)
+    except Exception as e:
+        print(e)
+        text = "Что-то пошло не так. Попробуйте еще раз."
+        bot.send_message(chat_id=call.message.chat.id, text=text)
+        bot.register_next_step_handler(call.message, request_padding)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -136,6 +138,8 @@ def callback_inline_position(call):
         set_scale(call)
     elif call.data in opacity_values:
         set_opacity(call)
+    elif call.data in padding_values:
+        set_padding(call)
     elif call.data in settings:
         change_setting(call)
 
@@ -149,14 +153,14 @@ def get_reply_keyboard():
 
 
 def process_photo(photo_path, watermark_path, user_id):
-    wmbed.create_marked_image(
+    wmbed.create_image_with_positional_watermark(
         image_path=photo_path,
         watermark_path=watermark_path,
         save_path=save_path,
         position=amogus[user_id]["position"],
         scale=amogus[user_id]["scale"],
         opacity=amogus[user_id]["opacity"],
-        padding=amogus[user_id]["padding"]
+        relative_padding=amogus[user_id]["padding"]
     )
 
 

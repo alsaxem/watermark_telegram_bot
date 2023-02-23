@@ -120,7 +120,7 @@ def set_opacity(call):
 
 def set_padding(call):
     try:
-        amogus[call.message.chat.id]["padding"] = float(call.data[:-1])/100
+        amogus[call.message.chat.id]["padding"] = float(call.data[:-1]) / 100
         save_dict()
         add_parameters(call.message)
     except Exception as e:
@@ -253,22 +253,33 @@ def save_dict():
         pickle.dump(amogus, f)
 
 
-if os.path.exists(users_file_path):
-    with open(users_file_path, 'rb') as f:
-        amogus = pickle.load(f)
-
-if not os.path.exists(temp_file_path):
-    os.makedirs(temp_file_path)
-
-if not os.path.exists(os.path.join(temp_file_path, photos_path)):
-    os.makedirs(os.path.join(temp_file_path, photos_path))
+def load_dict():
+    global amogus
+    if os.path.exists(users_file_path):
+        with open(users_file_path, 'rb') as f:
+            amogus = pickle.load(f)
 
 
-for user_id, user_data in amogus.items():
-    try:
-        message_text = 'Привет, я снова работаю!'
-        bot.send_message(chat_id=user_id, text=message_text, reply_markup=get_reply_keyboard())
-    except Exception as a:
-        print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})')
+def check_directories():
+    if not os.path.exists(temp_file_path):
+        os.makedirs(temp_file_path)
+    if not os.path.exists(os.path.join(temp_file_path, photos_path)):
+        os.makedirs(os.path.join(temp_file_path, photos_path))
 
+
+def send_start_message(text='Привет, я снова работаю!'):
+    for user_id, user_data in amogus.items():
+        try:
+            bot.send_message(chat_id=user_id, text=text, reply_markup=get_reply_keyboard())
+        except Exception as a:
+            print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})')
+
+
+def start():
+    load_dict()
+    check_directories()
+    send_start_message()
+
+
+start()
 bot.polling(none_stop=True)

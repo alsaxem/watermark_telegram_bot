@@ -146,7 +146,7 @@ def process_photo(photo_path, watermark_path, user_id):
     wmbed.create_image_with_positional_watermark(
         image_path=photo_path,
         watermark_path=watermark_path,
-        save_path=save_path,
+        save_path=os.path.join(temp_file_path, str(user_id), save_path),
         position=amogus[user_id]["position"],
         scale=amogus[user_id]["scale"],
         opacity=amogus[user_id]["opacity"],
@@ -207,36 +207,45 @@ def add_parameters(message):
 
 @bot.message_handler(content_types=['photo'])
 def handle_docs_photo(message):
-    if message.chat.id not in amogus:
+    user_id = message.chat.id
+    if user_id not in amogus:
         start(message)
-    elif empty_value in amogus[message.chat.id].values():
+    elif empty_value in amogus[user_id].values():
         add_parameters(message)
     else:
         try:
-            watermark_path = download_photo(amogus[message.chat.id]["watermark_id"])
-            photo_path = download_photo(message.photo[len(message.photo) - 1].file_id)
-            process_photo(photo_path, watermark_path, message.chat.id)
-            bot.send_photo(message.chat.id, open(save_path, 'rb'))
-            delete_file()
+            check_directories(user_id)
+            watermark_path = download_photo(amogus[user_id]["watermark_id"], user_id)
+            photo_path = download_photo(message.photo[len(message.photo) - 1].file_id, user_id)
+            process_photo(photo_path, watermark_path, user_id)
+            bot.send_photo(user_id, open(os.path.join(temp_file_path, str(user_id), save_path), 'rb'))
+            delete_file(user_id)
         except Exception as e:
             bot.reply_to(message, str(e))
 
 
-def download_photo(file_id):
+def download_photo(file_id, user_id):
     file_info = bot.get_file(file_id=file_id)
     downloaded_file = bot.download_file(file_info.file_path)
-    photo_path = temp_file_path + file_info.file_path
+    photo_path = os.path.join(temp_file_path, str(user_id), file_info.file_path)
     with open(photo_path, 'wb') as new_file:
         new_file.write(downloaded_file)
     return photo_path
 
 
-def delete_file():
-    folder_path = temp_file_path + "photos"
+def delete_file(user_id):
+    folder_path = os.path.join(temp_file_path, str(user_id), "photos")
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path):
             os.remove(file_path)
+
+
+def check_directories(user_id):
+    if not os.path.exists(os.path.join(temp_file_path, str(user_id))):
+        os.makedirs(os.path.join(temp_file_path, str(user_id)))
+    if not os.path.exists(os.path.join(temp_file_path, str(user_id), photos_path)):
+        os.makedirs(os.path.join(temp_file_path, str(user_id), photos_path))
 
 
 def save_dict():
@@ -251,13 +260,6 @@ def load_dict():
             amogus = pickle.load(f)
 
 
-def check_directories():
-    if not os.path.exists(temp_file_path):
-        os.makedirs(temp_file_path)
-    if not os.path.exists(os.path.join(temp_file_path, photos_path)):
-        os.makedirs(os.path.join(temp_file_path, photos_path))
-
-
 def send_start_message(text='Привет, я снова работаю!'):
     for user_id, user_data in amogus.items():
         try:
@@ -267,8 +269,9 @@ def send_start_message(text='Привет, я снова работаю!'):
 
 
 def bot_launch():
+    if not os.path.exists(temp_file_path):
+        os.makedirs(temp_file_path)
     load_dict()
-    check_directories()
     send_start_message()
 
 

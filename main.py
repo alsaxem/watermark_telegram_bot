@@ -266,11 +266,11 @@ def send_start_message(text='Привет, я снова работаю!'):
             print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})')
 
 
-def start():
+def bot_launch():
     load_dict()
     check_directories()
     send_start_message()
 
 
-start()
+bot_launch()
 bot.polling(none_stop=True)

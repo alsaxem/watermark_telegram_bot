@@ -12,6 +12,20 @@ def scale_watermark(watermark, image_size, relative_scale):
     return resized
 
 
+def embed_central_watermark(image, watermark, scale, opacity):
+    image_height, image_width = image.shape[:2]
+    watermark = scale_watermark(watermark, (image_width, image_height), scale)
+    watermark_height, watermark_width = watermark.shape[:2]
+    image_center_x = image_width // 2
+    image_center_y = image_height // 2
+    left_bound = image_center_x - watermark_width // 2
+    right_bound = left_bound + watermark_width
+    top_bound = image_center_y - watermark_height // 2
+    bottom_bound = top_bound + watermark_height
+    marked_image = embed(image, watermark, (left_bound, right_bound), (top_bound, bottom_bound), opacity)
+    return marked_image
+
+
 def embed_positional_watermark(image, watermark, position, scale, opacity, relative_padding):
     image_height, image_width = image.shape[:2]
     watermark = scale_watermark(watermark, (image_width, image_height), scale)
@@ -41,6 +55,18 @@ def embed(image, watermark, horizontal_bounds, vertical_bounds, opacity):
     marked_region_of_interest = cv2.addWeighted(region_of_interest, (1 - opacity), watermark, opacity, 0)
     image[vb1:vb2, hb1:hb2] = marked_region_of_interest
     return image
+
+
+def create_image_with_central_watermark(
+        image_path,
+        watermark_path,
+        save_path,
+        scale=1.0,
+        opacity=0.4):
+    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
+    marked_image = embed_central_watermark(image, watermark, scale, opacity)
+    cv2.imwrite(save_path, marked_image)
 
 
 def create_image_with_positional_watermark(

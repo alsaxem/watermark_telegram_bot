@@ -262,8 +262,8 @@ def send_start_message(text='Привет, я снова работаю!'):
     for user_id, user_data in amogus.items():
         try:
             bot.send_message(chat_id=user_id, text=text, reply_markup=get_reply_keyboard())
-        except Exception as a:
-            print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})')
+        except Exception as e:
+            print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})\n' + str(e))
 
 
 def bot_launch():

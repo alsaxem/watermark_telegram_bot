@@ -1,4 +1,6 @@
 import cv2
+import numpy as np
+import math
 
 
 def scale_watermark(watermark, image_size, relative_scale):
@@ -64,6 +66,20 @@ def embed_positional_watermark(image, watermark, position, scale, opacity, relat
     return marked_image
 
 
+def rotate_watermark(watermark, angle):
+    height, width = watermark.shape[:2]
+    image_center = (width // 2, height // 2)
+    rotation_mat = cv2.getRotationMatrix2D(image_center, -angle, 1.0)
+    abs_cos = abs(rotation_mat[0, 0])
+    abs_sin = abs(rotation_mat[0, 1])
+    new_width = int(height * abs_sin + width * abs_cos)
+    new_height = int(height * abs_cos + width * abs_sin)
+    rotation_mat[0, 2] += new_width // 2 - image_center[0]
+    rotation_mat[1, 2] += new_height // 2 - image_center[1]
+    rotated_mat = cv2.warpAffine(watermark, rotation_mat, (new_width, new_height))
+    return rotated_mat
+
+
 def crop(image, horizontal_bounds, vertical_bounds):
     hb1, hb2 = horizontal_bounds
     vb1, vb2 = vertical_bounds
@@ -75,6 +91,32 @@ def paste(image, insert, horizontal_bounds, vertical_bounds):
     vb1, vb2 = vertical_bounds
     image[vb1:vb2, hb1:hb2] = insert
     return image
+
+
+def get_diagonal(width, height):
+    return math.sqrt(width ** 2 + height ** 2)
+
+
+def embed_watermark_tiling(image, watermark, scale, angle, opacity):
+    image_height, image_width = image.shape[:2]
+    watermark = scale_watermark(watermark, (image_width, image_height), scale)
+    watermark_height, watermark_width = watermark.shape[:2]
+    tiling_size_lower_bound = round(get_diagonal(image_width, image_height))
+    tiling_width_weight = (tiling_size_lower_bound + watermark_width) // watermark_width
+    if tiling_width_weight % 2 == 0:
+        tiling_width_weight += 1
+    tiling_height_weight = (tiling_size_lower_bound + watermark_height) // watermark_height
+    if tiling_height_weight % 2 == 0:
+        tiling_height_weight += 1
+    watermark_tiling = np.tile(watermark, (tiling_height_weight, tiling_width_weight, 1))
+    if angle % 360 != 0:
+        watermark_tiling = rotate_watermark(watermark_tiling, angle)
+    watermark_tiling_height, watermark_tiling_width = watermark_tiling.shape[:2]
+    horizontal_bounds, vertical_bounds = get_central_bounds(
+        (watermark_tiling_width, watermark_tiling_height), (image_width, image_height))
+    cropped_watermark_tiling = crop(watermark_tiling, horizontal_bounds, vertical_bounds)
+    marked_image = embed(image, cropped_watermark_tiling, (0, image_width), (0, image_height), opacity)
+    return marked_image
 
 
 def embed(image, watermark, horizontal_bounds, vertical_bounds, opacity):
@@ -107,4 +149,17 @@ def create_image_with_positional_watermark(
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
     marked_image = embed_positional_watermark(image, watermark, position, scale, opacity, relative_padding)
+    cv2.imwrite(save_path, marked_image)
+
+
+def create_image_with_watermark_tiling(
+        image_path,
+        watermark_path,
+        save_path,
+        scale=1.0,
+        angle=0,
+        opacity=0.4):
+    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
+    marked_image = embed_watermark_tiling(image, watermark, scale, angle, opacity)
     cv2.imwrite(save_path, marked_image)

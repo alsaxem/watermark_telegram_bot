@@ -26,24 +26,32 @@ def embed_central_watermark(image, watermark, scale, opacity):
     return marked_image
 
 
+def get_positional_bounds(image_size, watermark_size, position, padding):
+    image_width, image_height = image_size
+    watermark_width, watermark_height = watermark_size
+    vertical_position = position[0]
+    horizontal_position = position[1]
+    horizontal_bounds = ()
+    vertical_bounds = ()
+    if vertical_position == "T":
+        vertical_bounds = (max(padding, 0), min(watermark_height + padding, image_height))
+    elif vertical_position == "B":
+        vertical_bounds = (max(image_height - watermark_height - padding, 0), min(image_height - padding, image_height))
+    if horizontal_position == "L":
+        horizontal_bounds = (max(padding, 0), min(watermark_width + padding, image_width))
+    elif horizontal_position == "R":
+        horizontal_bounds = (max(image_width - watermark_width - padding, 0), min(image_width - padding, image_width))
+    return horizontal_bounds, vertical_bounds
+
+
 def embed_positional_watermark(image, watermark, position, scale, opacity, relative_padding):
     image_height, image_width = image.shape[:2]
     watermark = scale_watermark(watermark, (image_width, image_height), scale)
     watermark_height, watermark_width = watermark.shape[:2]
     padding_limit = min(image_width - watermark_width, image_height - watermark_height)
     padding = int(padding_limit * relative_padding)
-    horizontal_bounds = ()
-    vertical_bounds = ()
-    vertical_position = position[0]
-    horizontal_position = position[1]
-    if vertical_position == "T":
-        vertical_bounds = (padding, watermark_height + padding)
-    elif vertical_position == "B":
-        vertical_bounds = (image_height - watermark_height - padding, image_height - padding)
-    if horizontal_position == "L":
-        horizontal_bounds = (padding, watermark_width + padding)
-    elif horizontal_position == "R":
-        horizontal_bounds = (image_width - watermark_width - padding, image_width - padding)
+    horizontal_bounds, vertical_bounds = get_positional_bounds(
+        (image_width, image_height), (watermark_width, watermark_height), position, padding)
     marked_image = embed(image, watermark, horizontal_bounds, vertical_bounds, opacity)
     return marked_image
 

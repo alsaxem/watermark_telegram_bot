@@ -85,6 +85,7 @@ def set_watermark_photo(message):
 @bot.callback_query_handler(func=lambda call: call.data in position_values)
 def set_position(call):
     try:
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         amogus[call.message.chat.id]["position"] = call.data
         save_dict()
         add_parameters(call.message)
@@ -98,6 +99,7 @@ def set_position(call):
 @bot.callback_query_handler(func=lambda call: call.data in scale_values)
 def set_scale(call):
     try:
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         amogus[call.message.chat.id]["scale"] = float(call.data[1:])
         save_dict()
         add_parameters(call.message)
@@ -111,6 +113,7 @@ def set_scale(call):
 @bot.callback_query_handler(func=lambda call: call.data in opacity_values)
 def set_opacity(call):
     try:
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         amogus[call.message.chat.id]["opacity"] = float(call.data)
         save_dict()
         add_parameters(call.message)
@@ -124,6 +127,7 @@ def set_opacity(call):
 @bot.callback_query_handler(func=lambda call: call.data in padding_values)
 def set_padding(call):
     try:
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         amogus[call.message.chat.id]["padding"] = float(call.data[:-1]) / 100
         save_dict()
         add_parameters(call.message)
@@ -185,6 +189,7 @@ def request_change_setting(user_id):
 
 @bot.callback_query_handler(func=lambda call: call.data in settings)
 def change_setting(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
     amogus[call.message.chat.id][call.data] = empty_value
     add_parameters(call.message)
 

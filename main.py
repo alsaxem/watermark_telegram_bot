@@ -301,7 +301,7 @@ def load_dict():
             amogus = pickle.load(f)
 
 
-def send_start_message(text='Привет, я снова работаю!'):
+def send_to_all(text):
     for user_id, user_data in amogus.items():
         try:
             bot.send_message(chat_id=user_id, text=text, reply_markup=get_reply_keyboard())
@@ -313,7 +313,7 @@ def bot_launch():
     if not os.path.exists(temp_file_path):
         os.makedirs(temp_file_path)
     load_dict()
-    send_start_message()
+    send_to_all('Привет, я снова работаю!')
 
 
 bot_launch()

@@ -6,6 +6,7 @@ import os
 from keyboa import Keyboa
 from config import (
     token,
+    owner_id,
     temp_file_path,
     photos_path,
     save_path,
@@ -36,6 +37,12 @@ def start(message):
     bot.send_message(chat_id=message.chat.id, text=text)
     save_dict()
     request_watermark_photo(message)
+
+
+@bot.message_handler(commands=['sendall'])
+def sendall(message):
+    if message.chat.id == owner_id:
+        send_to_all(message.text.replace("/sendall", ""))
 
 
 def request_watermark_photo(message):

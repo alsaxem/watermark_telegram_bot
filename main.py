@@ -11,6 +11,7 @@ from config import (
     photos_path,
     docs_path,
     save_path,
+    photo_extensions,
     empty_value,
     settings,
     position_values,
@@ -267,13 +268,16 @@ def handle_photo(message):
             bot.send_photo(user_id, open(os.path.join(temp_file_path, str(user_id), save_path), 'rb'))
             delete_files(user_id)
         except Exception as e:
-            print(1)
             bot.reply_to(message, str(e))
 
 
 @bot.message_handler(content_types=['document'])
 def handle_docs_photo(message):
-    handle_photo(message)
+    print(message.document.file_name.split('.')[-1])
+    if message.document.file_name.split('.')[-1] in photo_extensions:
+        handle_photo(message)
+    else:
+        bot.send_message(chat_id=message.chat.id, text="Недопустимый тип файла")
 
 
 def get_file_id(message):

@@ -283,7 +283,8 @@ def handle_docs_photo(message):
 def get_file_id(message):
     try:
         return message.photo[len(message.photo) - 1].file_id
-    except Exception: pass
+    except Exception:
+        pass
     try:
         return message.document.file_id
     except Exception:

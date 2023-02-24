@@ -31,7 +31,8 @@ def start(message):
         "position": empty_value,
         "scale": empty_value,
         "opacity": empty_value,
-        "padding": empty_value}
+        "padding": empty_value,
+        "angle": empty_value}
     bot.send_message(chat_id=message.chat.id, text=text)
     save_dict()
     request_watermark_photo(message)
@@ -65,6 +66,12 @@ def request_padding(message):
     text = "Укажите отступ водяного знака от края изображения в процентах:"
     keyboard = Keyboa(items=padding_values, items_in_row=5)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
+
+
+def request_angle(message):
+    text = "Укажите угол поворота водяного знака (целое число):"
+    bot.send_message(chat_id=message.chat.id, text=text)
+    bot.register_next_step_handler(message, set_angle)
 
 
 def set_watermark_photo(message):
@@ -122,8 +129,18 @@ def set_padding(call):
         bot.register_next_step_handler(call.message, request_padding)
 
 
-def set_parameter(message, column, data):
-    bot.delete_message(message.chat.id, message.message_id)
+def set_angle(message):
+    try:
+        set_parameter(message, column="angle", data=int(message.text), is_remove=False)
+    except Exception as e:
+        print(e)
+        process_exception(message)
+        bot.register_next_step_handler(message, request_angle)
+
+
+def set_parameter(message, column, data, is_remove=True):
+    if is_remove:
+        bot.delete_message(message.chat.id, message.message_id)
     amogus[message.chat.id][column] = data
     save_dict()
     add_parameters(message)
@@ -143,15 +160,33 @@ def get_reply_keyboard():
 
 
 def process_photo(photo_path, watermark_path, user_id):
-    wmbed.create_image_with_positional_watermark(
-        image_path=photo_path,
-        watermark_path=watermark_path,
-        save_path=os.path.join(temp_file_path, str(user_id), save_path),
-        position=amogus[user_id]["position"],
-        scale=amogus[user_id]["scale"],
-        opacity=amogus[user_id]["opacity"],
-        relative_padding=amogus[user_id]["padding"]
-    )
+    if amogus[user_id]["position"] == "CENTER":
+        wmbed.create_image_with_central_watermark(
+            image_path=photo_path,
+            watermark_path=watermark_path,
+            save_path=os.path.join(temp_file_path, str(user_id), save_path),
+            scale=amogus[user_id]["scale"],
+            opacity=amogus[user_id]["opacity"]
+        )
+    elif amogus[user_id]["position"] == "FILLING":
+        wmbed.create_image_with_watermark_tiling(
+            image_path=photo_path,
+            watermark_path=watermark_path,
+            save_path=os.path.join(temp_file_path, str(user_id), save_path),
+            scale=amogus[user_id]["scale"],
+            angle=amogus[user_id]["angle"],
+            opacity=amogus[user_id]["opacity"],
+        )
+    else:
+        wmbed.create_image_with_positional_watermark(
+            image_path=photo_path,
+            watermark_path=watermark_path,
+            save_path=os.path.join(temp_file_path, str(user_id), save_path),
+            position=amogus[user_id]["position"],
+            scale=amogus[user_id]["scale"],
+            opacity=amogus[user_id]["opacity"],
+            relative_padding=amogus[user_id]["padding"]
+        )
 
 
 @bot.message_handler(content_types=['text'])
@@ -191,16 +226,19 @@ def change_setting(call):
 
 
 def add_parameters(message):
-    if amogus[message.chat.id]["watermark_id"] == empty_value:
+    user_data = amogus[message.chat.id]
+    if user_data["watermark_id"] == empty_value:
         request_watermark_photo(message)
-    elif amogus[message.chat.id]["position"] == empty_value:
+    elif user_data["position"] == empty_value:
         request_watermark_position(message)
-    elif amogus[message.chat.id]["scale"] == empty_value:
+    elif user_data["scale"] == empty_value:
         request_scale(message)
-    elif amogus[message.chat.id]["opacity"] == empty_value:
+    elif user_data["opacity"] == empty_value:
         request_opacity(message)
-    elif amogus[message.chat.id]["padding"] == empty_value:
+    elif user_data["position"] not in position_values[:-2] and user_data["padding"] == empty_value:
         request_padding(message)
+    elif user_data["position"] == "FILLING" and user_data["angle"] == empty_value:
+        request_angle(message)
     else:
         text = "Все параметры указаны. Отправьте фото, которое хочешь защитить"
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
@@ -210,6 +248,8 @@ def add_parameters(message):
 def handle_docs_photo(message):
     user_id = message.chat.id
     if user_id not in amogus:
+        start(message)
+    elif amogus[user_id].keys() != settings:
         start(message)
     elif empty_value in amogus[user_id].values():
         add_parameters(message)

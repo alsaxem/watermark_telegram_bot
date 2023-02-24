@@ -320,7 +320,6 @@ def bot_launch():
     if not os.path.exists(temp_file_path):
         os.makedirs(temp_file_path)
     load_dict()
-    send_to_all('Привет, я снова работаю!')
 
 
 bot_launch()

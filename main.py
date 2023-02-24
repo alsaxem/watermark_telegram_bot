@@ -9,6 +9,7 @@ from config import (
     owner_id,
     temp_file_path,
     photos_path,
+    docs_path,
     save_path,
     empty_value,
     settings,
@@ -83,8 +84,7 @@ def request_angle(message):
 
 def set_watermark_photo(message):
     try:
-        photo_number = len(message.photo) - 1
-        amogus[message.chat.id]["watermark_id"] = message.photo[photo_number].file_id
+        amogus[message.chat.id]["watermark_id"] = get_file_id(message)
         text = "Знак добавлен"
         bot.send_message(chat_id=message.chat.id, text=text)
         save_dict()
@@ -252,11 +252,9 @@ def add_parameters(message):
 
 
 @bot.message_handler(content_types=['photo'])
-def handle_docs_photo(message):
+def handle_photo(message):
     user_id = message.chat.id
     if user_id not in amogus:
-        start(message)
-    elif amogus[user_id].keys() != settings:
         start(message)
     elif empty_value in amogus[user_id].values():
         add_parameters(message)
@@ -264,12 +262,28 @@ def handle_docs_photo(message):
         try:
             check_directories(user_id)
             watermark_path = download_photo(amogus[user_id]["watermark_id"], user_id)
-            photo_path = download_photo(message.photo[len(message.photo) - 1].file_id, user_id)
+            photo_path = download_photo(get_file_id(message), user_id)
             process_photo(photo_path, watermark_path, user_id)
             bot.send_photo(user_id, open(os.path.join(temp_file_path, str(user_id), save_path), 'rb'))
-            delete_file(user_id)
+            delete_files(user_id)
         except Exception as e:
+            print(1)
             bot.reply_to(message, str(e))
+
+
+@bot.message_handler(content_types=['document'])
+def handle_docs_photo(message):
+    handle_photo(message)
+
+
+def get_file_id(message):
+    try:
+        return message.photo[len(message.photo) - 1].file_id
+    except Exception: pass
+    try:
+        return message.document.file_id
+    except Exception:
+        return 0
 
 
 def download_photo(file_id, user_id):
@@ -281,8 +295,13 @@ def download_photo(file_id, user_id):
     return photo_path
 
 
-def delete_file(user_id):
-    folder_path = os.path.join(temp_file_path, str(user_id), "photos")
+def delete_files(user_id):
+    folder_path = os.path.join(temp_file_path, str(user_id), photos_path)
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+    folder_path = os.path.join(temp_file_path, str(user_id), docs_path)
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
         if os.path.isfile(file_path):
@@ -294,6 +313,8 @@ def check_directories(user_id):
         os.makedirs(os.path.join(temp_file_path, str(user_id)))
     if not os.path.exists(os.path.join(temp_file_path, str(user_id), photos_path)):
         os.makedirs(os.path.join(temp_file_path, str(user_id), photos_path))
+    if not os.path.exists(os.path.join(temp_file_path, str(user_id), docs_path)):
+        os.makedirs(os.path.join(temp_file_path, str(user_id), docs_path))
 
 
 def save_dict():

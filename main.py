@@ -70,7 +70,7 @@ def request_angle(message):
 
 def set_watermark_photo(message):
     try:
-        amogus[message.chat.id]["watermark_id"] = get_file_id(message)
+        amogus[message.chat.id]["watermark_id"] = get_photo_id(message)
         text = "Знак добавлен"
         bot.send_message(chat_id=message.chat.id, text=text)
         save_dict()
@@ -256,7 +256,7 @@ def handle_photo(message):
         try:
             check_directories(user_id)
             watermark_path = download_photo(amogus[user_id]["watermark_id"], user_id)
-            photo_path = download_photo(get_file_id(message), user_id)
+            photo_path = download_photo(get_photo_id(message), user_id)
             process_photo(photo_path, watermark_path, user_id)
             bot.send_photo(user_id, open(os.path.join(temp_file_path, str(user_id), save_path), 'rb'))
             delete_files(user_id)
@@ -273,7 +273,7 @@ def handle_docs_photo(message):
         bot.send_message(chat_id=message.chat.id, text="Недопустимый тип файла")
 
 
-def get_file_id(message):
+def get_photo_id(message):
     try:
         return message.photo[len(message.photo) - 1].file_id
     except Exception:

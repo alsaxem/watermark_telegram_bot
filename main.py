@@ -4,6 +4,7 @@ import telebot
 import os
 from keyboa import Keyboa
 from config import *
+from token import *
 
 amogus = {}
 

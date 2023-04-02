@@ -184,17 +184,25 @@ def process_photo(photo_path, watermark_path, user_id):
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    if message.chat.id not in amogus:
-        start(message)
-    elif empty_value in amogus[message.chat.id]:
-        add_parameters(message)
-    elif message.text == "Мои настройки":
+    if message.text == "Мои настройки":
         send_settings(message.chat.id)
     elif message.text == 'Изменить настройки':
         request_change_setting(message.chat.id)
-    else:
+    elif check_settings(message):
         text = "Отправьте фото для наложения водяного знака."
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
+
+
+def check_settings(message):
+    user_data = amogus[message.chat.id]
+    if message.chat.id not in amogus:
+        start(message)
+    elif empty_value in list(user_data.values())[:-1] or \
+            user_data["position"] == "FILLING" and user_data["angle"] == empty_value:
+        add_parameters(message)
+    else:
+        return True
+    return False
 
 
 def send_settings(user_id):
@@ -242,8 +250,8 @@ def handle_photo(message):
     user_id = message.chat.id
     if user_id not in amogus:
         start(message)
-    elif empty_value in amogus[user_id].values():
-        add_parameters(message)
+    elif not check_settings(message):
+        pass
     else:
         try:
             check_directories(user_id)

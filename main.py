@@ -79,7 +79,7 @@ def set_watermark_photo(message):
         print(e)
         text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=message.chat.id, text=text)
-        bot.register_next_step_handler(message, request_opacity)
+        bot.register_next_step_handler(message, request_watermark_photo)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in position_values)

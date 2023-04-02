@@ -147,18 +147,21 @@ def add_alpha(image):
     return np.concatenate([image, alpha], axis=2)
 
 
+def load_image_from_file(path):
+    image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    if image.shape[2] == 3:
+        image = add_alpha(image)
+    return image
+
+
 def create_image_with_central_watermark(
         image_path,
         watermark_path,
         save_path,
         scale=1.0,
         opacity=0.4):
-    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    if image.shape[2] == 3:
-        image = add_alpha(image)
-    watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
-    if watermark.shape[2] == 3:
-        watermark = add_alpha(watermark)
+    image = load_image_from_file(image_path)
+    watermark = load_image_from_file(watermark_path)
     marked_image = embed_central_watermark(image, watermark, scale, opacity)
     cv2.imwrite(save_path, marked_image)
 
@@ -171,12 +174,8 @@ def create_image_with_positional_watermark(
         scale=1.0,
         opacity=0.4,
         relative_padding=0):
-    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    if image.shape[2] == 3:
-        image = add_alpha(image)
-    watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
-    if watermark.shape[2] == 3:
-        watermark = add_alpha(watermark)
+    image = load_image_from_file(image_path)
+    watermark = load_image_from_file(watermark_path)
     marked_image = embed_positional_watermark(image, watermark, position, scale, opacity, relative_padding)
     cv2.imwrite(save_path, marked_image)
 
@@ -188,11 +187,7 @@ def create_image_with_watermark_tiling(
         scale=1.0,
         angle=0,
         opacity=0.4):
-    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    if image.shape[2] == 3:
-        image = add_alpha(image)
-    watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
-    if watermark.shape[2] == 3:
-        watermark = add_alpha(watermark)
+    image = load_image_from_file(image_path)
+    watermark = load_image_from_file(watermark_path)
     marked_image = embed_watermark_tiling(image, watermark, scale, angle, opacity)
     cv2.imwrite(save_path, marked_image)

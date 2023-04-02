@@ -1,25 +1,9 @@
 import pickle
-from telebot import types
 import wmbed
 import telebot
 import os
 from keyboa import Keyboa
-from config import (
-    token,
-    owner_id,
-    temp_file_path,
-    photos_path,
-    docs_path,
-    save_path,
-    photo_extensions,
-    empty_value,
-    settings,
-    position_values,
-    scale_values,
-    opacity_values,
-    padding_values,
-    users_file_path,
-)
+from config import *
 
 amogus = {}
 
@@ -160,9 +144,9 @@ def process_exception(message):
 
 
 def get_reply_keyboard():
-    keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
-    button1 = types.KeyboardButton('Мои настройки')
-    button2 = types.KeyboardButton('Изменить настройки')
+    keyboard = telebot.types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    button1 = telebot.types.KeyboardButton('Мои настройки')
+    button2 = telebot.types.KeyboardButton('Изменить настройки')
     keyboard.add(button1, button2)
     return keyboard
 

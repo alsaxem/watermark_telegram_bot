@@ -121,9 +121,25 @@ def embed_watermark_tiling(image, watermark, scale, angle, opacity):
 
 def embed(image, watermark, horizontal_bounds, vertical_bounds, opacity):
     region_of_interest = crop(image, horizontal_bounds, vertical_bounds)
-    marked_region_of_interest = cv2.addWeighted(region_of_interest, (1 - opacity), watermark, opacity, 0)
+    marked_region_of_interest = blend(region_of_interest, watermark, opacity)
     marked_image = paste(image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
     return marked_image
+
+
+def blend(image, overlay, alpha):
+    image = image / 255
+    overlay = overlay / 255 * alpha
+    overlay_color = overlay[..., :3]
+    overlay_alpha = np.expand_dims(overlay[..., 3], 2)
+    image_color = image[..., :3]
+    image_alpha = np.expand_dims(image[..., 3], 2)
+    blend_alpha = overlay_alpha + image_alpha - overlay_alpha * image_alpha
+    blend_color = np.divide(
+        overlay_alpha * overlay_color + (1 - overlay_alpha) * image_alpha * image_color,
+        blend_alpha,
+        out=np.zeros_like(overlay_color),
+        where=(blend_alpha != 0))
+    return np.concatenate([blend_color, blend_alpha], axis=2) * 255
 
 
 def create_image_with_central_watermark(
@@ -132,8 +148,8 @@ def create_image_with_central_watermark(
         save_path,
         scale=1.0,
         opacity=0.4):
-    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
     marked_image = embed_central_watermark(image, watermark, scale, opacity)
     cv2.imwrite(save_path, marked_image)
 
@@ -146,8 +162,8 @@ def create_image_with_positional_watermark(
         scale=1.0,
         opacity=0.4,
         relative_padding=0):
-    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
     marked_image = embed_positional_watermark(image, watermark, position, scale, opacity, relative_padding)
     cv2.imwrite(save_path, marked_image)
 
@@ -159,7 +175,7 @@ def create_image_with_watermark_tiling(
         scale=1.0,
         angle=0,
         opacity=0.4):
-    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
     marked_image = embed_watermark_tiling(image, watermark, scale, angle, opacity)
     cv2.imwrite(save_path, marked_image)

@@ -280,11 +280,13 @@ def get_photo_id(message):
     try:
         return message.photo[len(message.photo) - 1].file_id
     except Exception:
-        pass
-    try:
-        return message.document.file_id
-    except Exception:
-        return 0
+        try:
+            if message.document.file_name.split('.')[-1] in photo_extensions:
+                return message.document.file_id
+            else:
+                return empty_value
+        except Exception:
+            return empty_value
 
 
 def download_photo(file_id, user_id):

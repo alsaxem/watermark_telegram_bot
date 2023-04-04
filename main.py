@@ -71,9 +71,13 @@ def request_angle(message):
 def set_watermark_photo(message):
     try:
         amogus[message.chat.id]["watermark_id"] = get_photo_id(message)
-        text = "Знак добавлен"
-        bot.send_message(chat_id=message.chat.id, text=text)
-        save_dict()
+        if amogus[message.chat.id]["watermark_id"] != empty_value:
+            text = "Знак добавлен"
+            bot.send_message(chat_id=message.chat.id, text=text)
+            save_dict()
+        else:
+            text = "Водяным знаком может быть только фото!"
+            bot.send_message(chat_id=message.chat.id, text=text)
         add_parameters(message)
     except Exception as e:
         print(e)

@@ -207,9 +207,8 @@ def check_settings(message):
 
 def send_settings(user_id):
     user_settings = ""
-    for setting_name, setting_value in amogus[user_id].items():
-        if setting_name != "watermark_id":
-            user_settings += f"{setting_name}: {setting_value}\n"
+    for setting_name, setting_value in list(amogus[user_id].items())[1:]:
+        user_settings += f"{setting_name}: {setting_value}\n"
     bot.send_message(chat_id=user_id, text=user_settings)
 
 

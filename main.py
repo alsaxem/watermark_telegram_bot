@@ -239,7 +239,7 @@ def add_parameters(message):
         request_scale(message)
     elif user_data["opacity"] == empty_value:
         request_opacity(message)
-    elif user_data["position"] not in position_values[:-2] and user_data["padding"] == empty_value:
+    elif user_data["position"] not in position_values[-2:] and user_data["padding"] == empty_value:
         request_padding(message)
     elif user_data["position"] == "FILLING" and user_data["angle"] == empty_value:
         request_angle(message)

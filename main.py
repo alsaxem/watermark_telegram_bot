@@ -1,25 +1,10 @@
 import pickle
-from telebot import types
 import wmbed
 import telebot
 import os
 from keyboa import Keyboa
-from config import (
-    token,
-    owner_id,
-    temp_file_path,
-    photos_path,
-    docs_path,
-    save_path,
-    photo_extensions,
-    empty_value,
-    settings,
-    position_values,
-    scale_values,
-    opacity_values,
-    padding_values,
-    users_file_path,
-)
+from config import *
+from bot_token import *
 
 amogus = {}
 
@@ -85,16 +70,20 @@ def request_angle(message):
 
 def set_watermark_photo(message):
     try:
-        amogus[message.chat.id]["watermark_id"] = get_file_id(message)
-        text = "Знак добавлен"
-        bot.send_message(chat_id=message.chat.id, text=text)
-        save_dict()
+        amogus[message.chat.id]["watermark_id"] = get_photo_id(message)
+        if amogus[message.chat.id]["watermark_id"] != empty_value:
+            text = "Знак добавлен"
+            bot.send_message(chat_id=message.chat.id, text=text)
+            save_dict()
+        else:
+            text = "Водяным знаком может быть только фото!"
+            bot.send_message(chat_id=message.chat.id, text=text)
         add_parameters(message)
     except Exception as e:
         print(e)
         text = "Что-то пошло не так. Попробуйте еще раз."
         bot.send_message(chat_id=message.chat.id, text=text)
-        bot.register_next_step_handler(message, request_opacity)
+        bot.register_next_step_handler(message, request_watermark_photo)
 
 
 @bot.callback_query_handler(func=lambda call: call.data in position_values)
@@ -160,9 +149,9 @@ def process_exception(message):
 
 
 def get_reply_keyboard():
-    keyboard = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
-    button1 = types.KeyboardButton('Мои настройки')
-    button2 = types.KeyboardButton('Изменить настройки')
+    keyboard = telebot.types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
+    button1 = telebot.types.KeyboardButton('Мои настройки')
+    button2 = telebot.types.KeyboardButton('Изменить настройки')
     keyboard.add(button1, button2)
     return keyboard
 
@@ -199,24 +188,31 @@ def process_photo(photo_path, watermark_path, user_id):
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    if message.chat.id not in amogus:
-        start(message)
-    elif empty_value in amogus[message.chat.id]:
-        add_parameters(message)
-    elif message.text == "Мои настройки":
+    if message.text == "Мои настройки":
         send_settings(message.chat.id)
     elif message.text == 'Изменить настройки':
         request_change_setting(message.chat.id)
-    else:
+    elif check_settings(message):
         text = "Отправьте фото для наложения водяного знака."
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
 
 
+def check_settings(message):
+    user_data = amogus[message.chat.id]
+    if message.chat.id not in amogus:
+        start(message)
+    elif empty_value in list(user_data.values())[:-1] or \
+            user_data["position"] == "FILLING" and user_data["angle"] == empty_value:
+        add_parameters(message)
+    else:
+        return True
+    return False
+
+
 def send_settings(user_id):
     user_settings = ""
-    for setting_name, setting_value in amogus[user_id].items():
-        if setting_name != "watermark_id":
-            user_settings += f"{setting_name}: {setting_value}\n"
+    for setting_name, setting_value in list(amogus[user_id].items())[1:]:
+        user_settings += f"{setting_name}: {setting_value}\n"
     bot.send_message(chat_id=user_id, text=user_settings)
 
 
@@ -257,13 +253,13 @@ def handle_photo(message):
     user_id = message.chat.id
     if user_id not in amogus:
         start(message)
-    elif empty_value in amogus[user_id].values():
-        add_parameters(message)
+    elif not check_settings(message):
+        pass
     else:
         try:
             check_directories(user_id)
             watermark_path = download_photo(amogus[user_id]["watermark_id"], user_id)
-            photo_path = download_photo(get_file_id(message), user_id)
+            photo_path = download_photo(get_photo_id(message), user_id)
             process_photo(photo_path, watermark_path, user_id)
             bot.send_photo(user_id, open(os.path.join(temp_file_path, str(user_id), save_path), 'rb'))
             delete_files(user_id)
@@ -280,15 +276,17 @@ def handle_docs_photo(message):
         bot.send_message(chat_id=message.chat.id, text="Недопустимый тип файла")
 
 
-def get_file_id(message):
+def get_photo_id(message):
     try:
         return message.photo[len(message.photo) - 1].file_id
     except Exception:
-        pass
-    try:
-        return message.document.file_id
-    except Exception:
-        return 0
+        try:
+            if message.document.file_name.split('.')[-1] in photo_extensions:
+                return message.document.file_id
+            else:
+                return empty_value
+        except Exception:
+            return empty_value
 
 
 def download_photo(file_id, user_id):

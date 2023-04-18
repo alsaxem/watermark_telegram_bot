@@ -73,7 +73,8 @@ class WMbed:
             self._original_watermark = np.copy(self._original_watermark)
 
     def reset_watermark(self):
-        self._watermark = self._original_watermark
+        if self._original_watermark:
+            self._watermark = self._original_watermark
 
     def _scale_watermark(self, relative_scale):
         watermark_height, watermark_width = self._watermark.shape[:2]

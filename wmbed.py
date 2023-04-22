@@ -142,15 +142,16 @@ def blend(image, overlay, alpha):
     return np.concatenate([blend_color, blend_alpha], axis=2) * 255
 
 
-def add_alpha(image):
-    alpha = np.expand_dims(np.ones(image.shape[:2]), 2) * 255
-    return np.concatenate([image, alpha], axis=2)
+def add_missing_alpha(image):
+    if image.shape[2] == 3:
+        alpha = np.expand_dims(np.ones(image.shape[:2]), 2) * 255
+        image = np.concatenate([image, alpha], axis=2)
+    return image
 
 
 def load_image_from_file(path):
     image = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-    if image.shape[2] == 3:
-        image = add_alpha(image)
+    image = add_missing_alpha(image)
     return image
 
 

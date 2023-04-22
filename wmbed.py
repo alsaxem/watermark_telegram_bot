@@ -15,13 +15,13 @@ class WMbed:
         self.image = cv2.imread(image_path, cv2.IMREAD_COLOR)
         self.watermark = cv2.imread(watermark_path, cv2.IMREAD_COLOR)
         if store_watermark_copy:
-            self.original_watermark = np.copy(self.original_watermark)
+            self.original_watermark = np.copy(self.watermark)
 
     def from_bytearrays(self, image_bytearray, watermark_bytearray, store_watermark_copy=True):
         self.image = cv2.imdecode(np.fromstring(image_bytearray, np.uint8), cv2.IMREAD_COLOR)
         self.watermark = cv2.imdecode(np.fromstring(watermark_bytearray, np.uint8), cv2.IMREAD_COLOR)
         if store_watermark_copy:
-            self.original_watermark = np.copy(self.original_watermark)
+            self.original_watermark = np.copy(self.watermark)
 
     def reset_watermark(self):
         if self.original_watermark:

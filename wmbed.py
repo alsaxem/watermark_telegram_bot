@@ -1,55 +1,6 @@
 import cv2
 import numpy as np
-import math
-
-
-def get_central_bounds(image_size, watermark_size):
-    image_width, image_height = image_size
-    watermark_width, watermark_height = watermark_size
-    image_center_x = image_width // 2
-    image_center_y = image_height // 2
-    left_bound = max(image_center_x - watermark_width // 2, 0)
-    right_bound = min(left_bound + watermark_width, image_width)
-    top_bound = max(image_center_y - watermark_height // 2, 0)
-    bottom_bound = min(top_bound + watermark_height, image_height)
-    return (left_bound, right_bound), (top_bound, bottom_bound)
-
-
-def get_diagonal(width, height):
-    return math.sqrt(width ** 2 + height ** 2)
-
-
-def get_positional_bounds(image_size, watermark_size, position, padding):
-    image_width, image_height = image_size
-    watermark_width, watermark_height = watermark_size
-    vertical_position = position[0]
-    horizontal_position = position[1]
-    horizontal_bounds = ()
-    vertical_bounds = ()
-    if vertical_position == "T":
-        vertical_bounds = (max(padding, 0), min(watermark_height + padding, image_height))
-    elif vertical_position == "B":
-        vertical_bounds = (
-            max(image_height - watermark_height - padding, 0), min(image_height - padding, image_height))
-    if horizontal_position == "L":
-        horizontal_bounds = (max(padding, 0), min(watermark_width + padding, image_width))
-    elif horizontal_position == "R":
-        horizontal_bounds = (
-            max(image_width - watermark_width - padding, 0), min(image_width - padding, image_width))
-    return horizontal_bounds, vertical_bounds
-
-
-def crop(image, horizontal_bounds, vertical_bounds):
-    hb1, hb2 = horizontal_bounds
-    vb1, vb2 = vertical_bounds
-    return image[vb1:vb2, hb1:hb2]
-
-
-def paste(image, insert, horizontal_bounds, vertical_bounds):
-    hb1, hb2 = horizontal_bounds
-    vb1, vb2 = vertical_bounds
-    image[vb1:vb2, hb1:hb2] = insert
-    return image
+import utils
 
 
 class WMbed:
@@ -89,7 +40,7 @@ class WMbed:
         image_height, image_width = self.image.shape[:2]
         self.scale_watermark(scale)
         watermark_height, watermark_width = self.watermark.shape[:2]
-        horizontal_bounds, vertical_bounds = get_central_bounds(
+        horizontal_bounds, vertical_bounds = utils.get_central_bounds(
             (image_width, image_height), (watermark_width, watermark_height))
         self.embed(horizontal_bounds, vertical_bounds, opacity)
 
@@ -99,7 +50,7 @@ class WMbed:
         watermark_height, watermark_width = self.watermark.shape[:2]
         padding_limit = min(image_width - watermark_width, image_height - watermark_height)
         padding = int(padding_limit * relative_padding)
-        horizontal_bounds, vertical_bounds = get_positional_bounds(
+        horizontal_bounds, vertical_bounds = utils.get_positional_bounds(
             (image_width, image_height), (watermark_width, watermark_height), position, padding)
         self.embed(horizontal_bounds, vertical_bounds, opacity)
 
@@ -119,7 +70,7 @@ class WMbed:
         image_height, image_width = self.image.shape[:2]
         self.scale_watermark(scale)
         watermark_height, watermark_width = self.watermark.shape[:2]
-        tiling_size_lower_bound = round(get_diagonal(image_width, image_height))
+        tiling_size_lower_bound = round(utils.get_diagonal(image_width, image_height))
         tiling_width_weight = (tiling_size_lower_bound + watermark_width) // watermark_width
         if tiling_width_weight % 2 == 0:
             tiling_width_weight += 1
@@ -130,16 +81,16 @@ class WMbed:
         if angle % 360 != 0:
             self.rotate_watermark(angle)
         watermark_tiling_height, watermark_tiling_width = self.watermark.shape[:2]
-        horizontal_bounds, vertical_bounds = get_central_bounds(
+        horizontal_bounds, vertical_bounds = utils.get_central_bounds(
             (watermark_tiling_width, watermark_tiling_height), (image_width, image_height))
-        self.watermark = crop(self.watermark, horizontal_bounds, vertical_bounds)
+        self.watermark = utils.crop(self.watermark, horizontal_bounds, vertical_bounds)
         self.embed((0, image_width), (0, image_height), opacity)
 
     def embed(self, horizontal_bounds, vertical_bounds, opacity):
-        region_of_interest = crop(self.image, horizontal_bounds, vertical_bounds)
+        region_of_interest = utils.crop(self.image, horizontal_bounds, vertical_bounds)
         marked_region_of_interest = cv2.addWeighted(
             region_of_interest, (1 - opacity), self.watermark, opacity, 0)
-        self.marked_image = paste(self.image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
+        self.marked_image = utils.paste(self.image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
         
     def save_to_file(self, save_path):
         cv2.imwrite(save_path, self.marked_image)

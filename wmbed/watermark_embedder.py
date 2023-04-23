@@ -1,9 +1,8 @@
 import cv2
-import numpy as np
-import wmbed_utils
+from .utils import *
 
 
-class WMbed:
+class WatermarkEmbedder:
 
     def __init__(self):
         self.image = None
@@ -13,17 +12,17 @@ class WMbed:
 
     def from_files(self, image_path, watermark_path, store_watermark_copy=True):
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        self.image = wmbed_utils.add_missing_alpha(image)
+        self.image = add_missing_alpha(image)
         watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
-        self.watermark = wmbed_utils.add_missing_alpha(watermark)
+        self.watermark = add_missing_alpha(watermark)
         if store_watermark_copy:
             self.original_watermark = np.copy(self.watermark)
 
     def from_bytearrays(self, image_bytearray, watermark_bytearray, store_watermark_copy=True):
         image = cv2.imdecode(np.frombuffer(image_bytearray, np.uint8), cv2.IMREAD_UNCHANGED)
-        self.image = wmbed_utils.add_missing_alpha(image)
+        self.image = add_missing_alpha(image)
         watermark = cv2.imdecode(np.frombuffer(watermark_bytearray, np.uint8), cv2.IMREAD_UNCHANGED)
-        self.watermark = wmbed_utils.add_missing_alpha(watermark)
+        self.watermark = add_missing_alpha(watermark)
         if store_watermark_copy:
             self.original_watermark = np.copy(self.watermark)
 
@@ -44,7 +43,7 @@ class WMbed:
         image_height, image_width = self.image.shape[:2]
         self.scale_watermark(scale)
         watermark_height, watermark_width = self.watermark.shape[:2]
-        horizontal_bounds, vertical_bounds = wmbed_utils.get_central_bounds(
+        horizontal_bounds, vertical_bounds = get_central_bounds(
             (image_width, image_height), (watermark_width, watermark_height))
         self.embed(horizontal_bounds, vertical_bounds, opacity)
 
@@ -54,7 +53,7 @@ class WMbed:
         watermark_height, watermark_width = self.watermark.shape[:2]
         padding_limit = min(image_width - watermark_width, image_height - watermark_height)
         padding = int(padding_limit * relative_padding)
-        horizontal_bounds, vertical_bounds = wmbed_utils.get_positional_bounds(
+        horizontal_bounds, vertical_bounds = get_positional_bounds(
             (image_width, image_height), (watermark_width, watermark_height), position, padding)
         self.embed(horizontal_bounds, vertical_bounds, opacity)
 
@@ -74,7 +73,7 @@ class WMbed:
         image_height, image_width = self.image.shape[:2]
         self.scale_watermark(scale)
         watermark_height, watermark_width = self.watermark.shape[:2]
-        tiling_size_lower_bound = round(wmbed_utils.get_diagonal(image_width, image_height))
+        tiling_size_lower_bound = round(get_diagonal(image_width, image_height))
         tiling_width_weight = (tiling_size_lower_bound + watermark_width) // watermark_width
         if tiling_width_weight % 2 == 0:
             tiling_width_weight += 1
@@ -85,15 +84,15 @@ class WMbed:
         if angle % 360 != 0:
             self.rotate_watermark(angle)
         watermark_tiling_height, watermark_tiling_width = self.watermark.shape[:2]
-        horizontal_bounds, vertical_bounds = wmbed_utils.get_central_bounds(
+        horizontal_bounds, vertical_bounds = get_central_bounds(
             (watermark_tiling_width, watermark_tiling_height), (image_width, image_height))
-        self.watermark = wmbed_utils.crop(self.watermark, horizontal_bounds, vertical_bounds)
+        self.watermark = crop(self.watermark, horizontal_bounds, vertical_bounds)
         self.embed((0, image_width), (0, image_height), opacity)
 
     def embed(self, horizontal_bounds, vertical_bounds, opacity):
-        region_of_interest = wmbed_utils.crop(self.image, horizontal_bounds, vertical_bounds)
-        marked_region_of_interest = wmbed_utils.blend(region_of_interest, self.watermark, opacity)
-        self.marked_image = wmbed_utils.paste(self.image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
+        region_of_interest = crop(self.image, horizontal_bounds, vertical_bounds)
+        marked_region_of_interest = blend(region_of_interest, self.watermark, opacity)
+        self.marked_image = paste(self.image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
 
     def save_to_file(self, save_path):
         cv2.imwrite(save_path, self.marked_image)

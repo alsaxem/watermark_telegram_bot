@@ -39,14 +39,6 @@ class WatermarkEmbedder:
         resized_dimensions = (int(watermark_width * true_scale), int(watermark_height * true_scale))
         self.watermark = cv2.resize(self.watermark, resized_dimensions, interpolation=cv2.INTER_AREA)
 
-    def embed_central_watermark(self, scale=1.0, opacity=0.4):
-        image_height, image_width = self.image.shape[:2]
-        self.scale_watermark(scale)
-        watermark_height, watermark_width = self.watermark.shape[:2]
-        horizontal_bounds, vertical_bounds = get_central_bounds(
-            (image_width, image_height), (watermark_width, watermark_height))
-        self.embed(horizontal_bounds, vertical_bounds, opacity)
-
     def embed_positional_watermark(self, position="BR", scale=1.0, opacity=0.4, relative_padding=0):
         image_height, image_width = self.image.shape[:2]
         self.scale_watermark(scale)
@@ -84,8 +76,8 @@ class WatermarkEmbedder:
         if angle % 360 != 0:
             self.rotate_watermark(angle)
         watermark_tiling_height, watermark_tiling_width = self.watermark.shape[:2]
-        horizontal_bounds, vertical_bounds = get_central_bounds(
-            (watermark_tiling_width, watermark_tiling_height), (image_width, image_height))
+        horizontal_bounds, vertical_bounds = get_positional_bounds(
+            (watermark_tiling_width, watermark_tiling_height), (image_width, image_height), "CC", 0)
         self.watermark = crop(self.watermark, horizontal_bounds, vertical_bounds)
         self.embed((0, image_width), (0, image_height), opacity)
 

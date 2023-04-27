@@ -6,11 +6,12 @@ def create_image_with_positional_watermark(
         watermark_bytearray,
         position,
         scale,
+        angle,
         opacity,
         relative_padding):
     watermark_embedder = WatermarkEmbedder()
     watermark_embedder.from_bytearrays(image_bytearray, watermark_bytearray, False)
-    watermark_embedder.embed_positional_watermark(position, scale, opacity, relative_padding)
+    watermark_embedder.embed_positional_watermark(position, scale, angle, opacity, relative_padding)
     return watermark_embedder.get_result_byte_array()
 
 

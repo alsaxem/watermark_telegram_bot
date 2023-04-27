@@ -45,8 +45,10 @@ class WatermarkEmbedder:
         resized_dimensions = (int(watermark_width * true_scale), int(watermark_height * true_scale))
         self.watermark = cv2.resize(self.watermark, resized_dimensions, interpolation=cv2.INTER_AREA)
 
-    def embed_positional_watermark(self, position="BR", scale=1.0, opacity=0.4, relative_padding=0):
+    def embed_positional_watermark(self, position="BR", scale=1.0, angle=0, opacity=0.4, relative_padding=0):
         image_width, image_height = self.get_image_size()
+        if angle % 360 != 0:
+            self.rotate_watermark(angle)
         self.scale_watermark(scale)
         watermark_width, watermark_height = self.get_watermark_size()
         padding_limit = min(image_width - watermark_width, image_height - watermark_height)

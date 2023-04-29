@@ -1,5 +1,5 @@
 import pickle
-import wmbed
+from wmbed.telegram_api import *
 import telebot
 import os
 from keyboa import Keyboa
@@ -157,33 +157,25 @@ def get_reply_keyboard():
 
 
 def process_photo(photo_path, watermark_path, user_id):
-    if amogus[user_id]["position"] == "CENTER":
-        wmbed.create_image_with_central_watermark(
-            image_path=photo_path,
-            watermark_path=watermark_path,
-            save_path=os.path.join(temp_file_path, str(user_id), save_path),
-            scale=amogus[user_id]["scale"],
-            opacity=amogus[user_id]["opacity"]
-        )
-    elif amogus[user_id]["position"] == "FILLING":
-        wmbed.create_image_with_watermark_tiling(
-            image_path=photo_path,
-            watermark_path=watermark_path,
-            save_path=os.path.join(temp_file_path, str(user_id), save_path),
+    if amogus[user_id]["position"] == "FILLING":
+        photo_bytearray = create_image_with_watermark_tiling(
+            image_bytearray=photo_path,
+            watermark_bytearray=watermark_path,
             scale=amogus[user_id]["scale"],
             angle=amogus[user_id]["angle"],
             opacity=amogus[user_id]["opacity"],
         )
     else:
-        wmbed.create_image_with_positional_watermark(
-            image_path=photo_path,
-            watermark_path=watermark_path,
-            save_path=os.path.join(temp_file_path, str(user_id), save_path),
+        photo_bytearray = create_image_with_positional_watermark(
+            image_bytearray=photo_path,
+            watermark_bytearray=watermark_path,
             position=amogus[user_id]["position"],
             scale=amogus[user_id]["scale"],
+            angle=amogus[user_id]["angle"],
             opacity=amogus[user_id]["opacity"],
-            relative_padding=amogus[user_id]["padding"]
+            relative_padding=amogus[user_id]["padding"],
         )
+    return photo_bytearray
 
 
 @bot.message_handler(content_types=['text'])
@@ -240,9 +232,9 @@ def add_parameters(message):
         request_scale(message)
     elif user_data["opacity"] == empty_value:
         request_opacity(message)
-    elif user_data["position"] not in position_values[-2:] and user_data["padding"] == empty_value:
+    elif user_data["position"] != position_values[-1] and user_data["padding"] == empty_value:
         request_padding(message)
-    elif user_data["position"] == "FILLING" and user_data["angle"] == empty_value:
+    elif user_data["angle"] == empty_value:
         request_angle(message)
     else:
         text = "Все параметры указаны. Отправьте фото, которое хочешь защитить"
@@ -258,12 +250,10 @@ def handle_photo(message):
         pass
     else:
         try:
-            check_directories(user_id)
-            watermark_path = download_photo(amogus[user_id]["watermark_id"], user_id)
-            photo_path = download_photo(get_photo_id(message), user_id)
-            process_photo(photo_path, watermark_path, user_id)
-            bot.send_photo(user_id, open(os.path.join(temp_file_path, str(user_id), save_path), 'rb'))
-            delete_files(user_id)
+            watermark_path = download_photo(amogus[user_id]["watermark_id"])
+            photo_path = download_photo(get_photo_id(message))
+            photo_bytearray = process_photo(photo_path, watermark_path, user_id)
+            bot.send_photo(user_id, photo_bytearray)
         except Exception as e:
             bot.reply_to(message, str(e))
 
@@ -290,35 +280,10 @@ def get_photo_id(message):
             return empty_value
 
 
-def download_photo(file_id, user_id):
+def download_photo(file_id):
     file_info = bot.get_file(file_id=file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-    photo_path = os.path.join(temp_file_path, str(user_id), file_info.file_path)
-    with open(photo_path, 'wb') as new_file:
-        new_file.write(downloaded_file)
-    return photo_path
-
-
-def delete_files(user_id):
-    folder_path = os.path.join(temp_file_path, str(user_id), photos_path)
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-    folder_path = os.path.join(temp_file_path, str(user_id), docs_path)
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-
-
-def check_directories(user_id):
-    if not os.path.exists(os.path.join(temp_file_path, str(user_id))):
-        os.makedirs(os.path.join(temp_file_path, str(user_id)))
-    if not os.path.exists(os.path.join(temp_file_path, str(user_id), photos_path)):
-        os.makedirs(os.path.join(temp_file_path, str(user_id), photos_path))
-    if not os.path.exists(os.path.join(temp_file_path, str(user_id), docs_path)):
-        os.makedirs(os.path.join(temp_file_path, str(user_id), docs_path))
+    file_bytearray = bot.download_file(file_info.file_path)
+    return file_bytearray
 
 
 def save_dict():
@@ -342,8 +307,6 @@ def send_to_all(text):
 
 
 def bot_launch():
-    if not os.path.exists(temp_file_path):
-        os.makedirs(temp_file_path)
     load_dict()
 
 

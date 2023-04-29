@@ -40,7 +40,7 @@ def request_watermark_photo(message):
 
 def request_watermark_position(message):
     text = "Выберете место расположения водяного знака:"
-    keyboard = Keyboa(items=position_values, items_in_row=2)
+    keyboard = Keyboa(items=position_values, items_in_row=3)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 

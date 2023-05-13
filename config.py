@@ -2,7 +2,7 @@ owner_id = 373733750
 photo_extensions = ["jpg", "png", "jpeg"]
 users_file_path = "users_DB.pkl"
 
-empty_value = 'Undefined'
+empty_value = None
 
 settings = ["watermark_id", "position", "scale", "opacity", "padding", "angle"]
 position_values = ["TL", "TC", "TR", "CL", "CC", "CR", "BL", "BC", "BR", "FILLING"]

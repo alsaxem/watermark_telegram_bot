@@ -5,6 +5,7 @@ import os
 from keyboa import Keyboa
 from config import *
 from bot_token import *
+import dbutils
 
 amogus = {}
 
@@ -14,13 +15,7 @@ bot = telebot.TeleBot(token)
 @bot.message_handler(commands=['start'])
 def start(message):
     text = "Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком."
-    amogus[message.chat.id] = {
-        "watermark_id": empty_value,
-        "position": empty_value,
-        "scale": empty_value,
-        "opacity": empty_value,
-        "padding": empty_value,
-        "angle": empty_value}
+    dbutils.add_user(message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text)
     save_dict()
     request_watermark_photo(message)

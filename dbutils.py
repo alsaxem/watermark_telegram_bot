@@ -37,8 +37,8 @@ def get_all_info(user_id):
 
 
 def add_user(*args):
-    c.execute("INSERT OR IGNORE INTO users (user_id, name)"
-              "VALUES (?, ?)", args)
+    c.execute("INSERT OR REPLACE INTO users (user_id, name, watermark_id, position, scale, opacity, padding, language)"
+              "VALUES (?, ?, NULL, NULL, NULL, NULL, NULL, NULL)", args)
     conn.commit()
 
 

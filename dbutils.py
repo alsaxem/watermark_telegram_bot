@@ -43,6 +43,6 @@ def add_user(*args):
 
 
 def update_info(user_id, field, value):
-    c.execute("UPDATE users SET " + field + " = " + value + " WHERE user_id = " + user_id)
+    c.execute("UPDATE users SET " + field + " = " + str(value) + " WHERE user_id = " + str(user_id))
     conn.commit()
 

@@ -1,13 +1,9 @@
-import pickle
 from wmbed.telegram_api import *
 import telebot
-import os
 from keyboa import Keyboa
 from config import *
 from bot_token import *
 import dbutils
-
-amogus = {}
 
 bot = telebot.TeleBot(token)
 
@@ -15,9 +11,8 @@ bot = telebot.TeleBot(token)
 @bot.message_handler(commands=['start'])
 def start(message):
     text = "Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком."
-    dbutils.add_user(message.chat.id)
+    dbutils.add_user(message.chat.id, message.from_user.first_name + " " + message.from_user.last_name)
     bot.send_message(chat_id=message.chat.id, text=text)
-    save_dict()
     request_watermark_photo(message)
 
 
@@ -65,11 +60,11 @@ def request_angle(message):
 
 def set_watermark_photo(message):
     try:
-        amogus[message.chat.id]["watermark_id"] = get_photo_id(message)
-        if amogus[message.chat.id]["watermark_id"] != empty_value:
+        photo_id = get_photo_id(message)
+        if photo_id != empty_value:
+            dbutils.update_info(message.chat.id, "watermark_id", photo_id)
             text = "Знак добавлен"
             bot.send_message(chat_id=message.chat.id, text=text)
-            save_dict()
         else:
             text = "Водяным знаком может быть только фото!"
             bot.send_message(chat_id=message.chat.id, text=text)
@@ -132,8 +127,7 @@ def set_angle(message):
 def set_parameter(message, column, data, is_remove=True):
     if is_remove:
         bot.delete_message(message.chat.id, message.message_id)
-    amogus[message.chat.id][column] = data
-    save_dict()
+    dbutils.update_info(message.chat.id, column, data)
     add_parameters(message)
 
 
@@ -151,23 +145,25 @@ def get_reply_keyboard():
 
 
 def process_photo(photo_bytearray, watermark_bytearray, user_id):
-    if amogus[user_id]["position"] == "FILLING":
+    position, scale, opacity, padding, angle = dbutils.get_fields_info(user_id,
+                                                                       "position, scale, opacity, padding, angle")
+    if position == "FILLING":
         photo_bytearray = create_image_with_watermark_tiling(
             image_bytearray=photo_bytearray,
             watermark_bytearray=watermark_bytearray,
-            scale=amogus[user_id]["scale"],
-            angle=amogus[user_id]["angle"],
-            opacity=amogus[user_id]["opacity"],
+            scale=scale,
+            angle=angle,
+            opacity=opacity,
         )
     else:
         photo_bytearray = create_image_with_positional_watermark(
             image_bytearray=photo_bytearray,
             watermark_bytearray=watermark_bytearray,
-            position=amogus[user_id]["position"],
-            scale=amogus[user_id]["scale"],
-            angle=amogus[user_id]["angle"],
-            opacity=amogus[user_id]["opacity"],
-            relative_padding=amogus[user_id]["padding"],
+            position=position,
+            scale=scale,
+            angle=angle,
+            opacity=opacity,
+            relative_padding=padding,
         )
     return photo_bytearray
 
@@ -184,11 +180,11 @@ def handle_text(message):
 
 
 def check_settings(message):
-    user_data = amogus[message.chat.id]
-    if message.chat.id not in amogus:
+    user_data = dbutils.get_fields_info(message.chat.id, "watermark_id, position, scale, opacity, angle, padding")
+    if not dbutils.is_user_exist(message.chat.id):
         start(message)
-    elif empty_value in list(user_data.values())[:-1] or \
-            user_data["position"] != "FILLING" and user_data["padding"] == empty_value:
+    elif empty_value in user_data[:-1] or \
+            user_data[1] != "FILLING" and user_data[-1] == empty_value:
         add_parameters(message)
     else:
         return True
@@ -197,8 +193,12 @@ def check_settings(message):
 
 def send_settings(user_id):
     user_settings = ""
-    for setting_name, setting_value in list(amogus[user_id].items())[1:]:
-        user_settings += f"{setting_name}: {setting_value}\n"
+    setting_names = ["position", "scale", "opacity", "angle", "padding"]
+    setting_values = dbutils.get_fields_info(user_id, "position, scale, opacity, angle, padding")
+    if not setting_values:
+        setting_values = [empty_value, empty_value, empty_value, empty_value, empty_value]
+    for i in range(0, len(setting_names)):
+        user_settings += f"{setting_names[i]}: {setting_values[i]}\n"
     bot.send_message(chat_id=user_id, text=user_settings)
 
 
@@ -211,23 +211,25 @@ def request_change_setting(user_id):
 @bot.callback_query_handler(func=lambda call: call.data in settings)
 def change_setting(call):
     bot.delete_message(call.message.chat.id, call.message.message_id)
-    amogus[call.message.chat.id][call.data] = empty_value
+    dbutils.update_info(call.message.chat.id, call.data, empty_value)
     add_parameters(call.message)
 
 
 def add_parameters(message):
-    user_data = amogus[message.chat.id]
-    if user_data["watermark_id"] == empty_value:
+    watermark_id, position, scale, opacity, padding, angle = dbutils.get_fields_info(message.chat.id,
+                                                                                     "watermark_id, position, scale,"
+                                                                                     "opacity, padding, angle")
+    if watermark_id == empty_value:
         request_watermark_photo(message)
-    elif user_data["position"] == empty_value:
+    elif position == empty_value:
         request_watermark_position(message)
-    elif user_data["scale"] == empty_value:
+    elif scale == empty_value:
         request_scale(message)
-    elif user_data["opacity"] == empty_value:
+    elif opacity == empty_value:
         request_opacity(message)
-    elif user_data["position"] != position_values[-1] and user_data["padding"] == empty_value:
+    elif position == position_values[-1] and padding == empty_value:
         request_padding(message)
-    elif user_data["angle"] == empty_value:
+    elif angle == empty_value:
         request_angle(message)
     else:
         text = "Все параметры указаны. Отправьте фото, которое хочешь защитить"
@@ -241,7 +243,7 @@ def handle_photo(message):
         pass
     else:
         try:
-            watermark_bytearray = download_photo(amogus[user_id]["watermark_id"])
+            watermark_bytearray = download_photo(dbutils.get_fields_info(user_id, "watermark_id"))
             photo_path = download_photo(get_photo_id(message))
             photo_bytearray = process_photo(photo_path, watermark_bytearray, user_id)
             bot.send_photo(user_id, photo_bytearray)
@@ -274,29 +276,12 @@ def download_photo(file_id):
     return file_bytearray
 
 
-def save_dict():
-    with open(users_file_path, 'wb') as f:
-        pickle.dump(amogus, f)
-
-
-def load_dict():
-    global amogus
-    if os.path.exists(users_file_path):
-        with open(users_file_path, 'rb') as f:
-            amogus = pickle.load(f)
-
-
 def send_to_all(text):
-    for user_id, user_data in amogus.items():
+    for user_id in dbutils.get_all_users():
         try:
             bot.send_message(chat_id=user_id, text=text, reply_markup=get_reply_keyboard())
         except Exception as e:
-            print(f'Не удалось отправить сообщение пользователю {user_id} (user_data: {user_data})\n' + str(e))
+            print(f'Не удалось отправить сообщение пользователю {user_id}\n' + str(e))
 
 
-def bot_launch():
-    load_dict()
-
-
-bot_launch()
 bot.polling(none_stop=True)

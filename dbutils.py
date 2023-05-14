@@ -42,7 +42,9 @@ def add_user(*args):
     conn.commit()
 
 
-def update_info(user_id, field, value):
-    c.execute("UPDATE users SET " + field + " = " + str(value) + " WHERE user_id = " + str(user_id))
+def update_info(user_id, column, value):
+    if type(value) is str:
+        value = "\"" + value + "\""
+    c.execute("UPDATE users SET " + column + "=" + value + " WHERE user_id = " + str(user_id))
     conn.commit()
 

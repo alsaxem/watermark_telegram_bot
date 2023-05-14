@@ -150,11 +150,11 @@ def get_reply_keyboard():
     return keyboard
 
 
-def process_photo(photo_bytearray, watermark_path, user_id):
+def process_photo(photo_bytearray, watermark_bytearray, user_id):
     if amogus[user_id]["position"] == "FILLING":
         photo_bytearray = create_image_with_watermark_tiling(
             image_bytearray=photo_bytearray,
-            watermark_bytearray=watermark_path,
+            watermark_bytearray=watermark_bytearray,
             scale=amogus[user_id]["scale"],
             angle=amogus[user_id]["angle"],
             opacity=amogus[user_id]["opacity"],
@@ -162,7 +162,7 @@ def process_photo(photo_bytearray, watermark_path, user_id):
     else:
         photo_bytearray = create_image_with_positional_watermark(
             image_bytearray=photo_bytearray,
-            watermark_bytearray=watermark_path,
+            watermark_bytearray=watermark_bytearray,
             position=amogus[user_id]["position"],
             scale=amogus[user_id]["scale"],
             angle=amogus[user_id]["angle"],
@@ -244,9 +244,9 @@ def handle_photo(message):
         pass
     else:
         try:
-            watermark_path = download_photo(amogus[user_id]["watermark_id"])
+            watermark_bytearray = download_photo(amogus[user_id]["watermark_id"])
             photo_path = download_photo(get_photo_id(message))
-            photo_bytearray = process_photo(photo_path, watermark_path, user_id)
+            photo_bytearray = process_photo(photo_path, watermark_bytearray, user_id)
             bot.send_photo(user_id, photo_bytearray)
         except Exception as e:
             bot.reply_to(message, str(e))

@@ -25,11 +25,10 @@ def drop_table(table_name="users"):
 
 def get_fields_info(user_id, fields):
     c.execute("SELECT " + fields + " FROM users WHERE user_id=?", (user_id,))
-    if "," in fields:
-        fields_info = c.fetchone()
-    else:
-        fields_info, = c.fetchone()
-    return fields_info
+    data = c.fetchone()
+    if data:
+        data = list(data)
+    return data
 
 
 def get_all_info(user_id):

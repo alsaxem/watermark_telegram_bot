@@ -49,3 +49,7 @@ def update_info(user_id, column, value):
         value = "\"" + value + "\""
     c.execute("UPDATE users SET " + column + "=" + value + " WHERE user_id = " + str(user_id))
     conn.commit()
+
+
+def is_user_exist(user_id):
+    return bool(get_fields_info(user_id, "user_id"))

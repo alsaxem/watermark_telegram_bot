@@ -15,6 +15,7 @@ def create_users_table():
               "scale FLOAT,"
               "opacity FLOAT,"
               "padding FLOAT, "
+              "angle INTEGER"
               "language TEXT)")
 
 

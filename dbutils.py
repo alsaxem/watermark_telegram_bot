@@ -53,3 +53,6 @@ def update_info(user_id, column, value):
 
 def is_user_exist(user_id):
     return bool(get_fields_info(user_id, "user_id"))
+
+
+create_users_table()

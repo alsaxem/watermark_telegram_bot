@@ -37,6 +37,11 @@ def get_all_info(user_id):
     return c.fetchone()
 
 
+def get_all_users():
+    c.execute("SELECT user_id FROM users")
+    return [item[0] for item in c.fetchall()]
+
+
 def add_user(*args):
     c.execute("INSERT OR REPLACE INTO users (user_id, name, watermark_id, position, scale, opacity, "
               "padding, angle, language)"

@@ -237,9 +237,7 @@ def add_parameters(message):
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     user_id = message.chat.id
-    if user_id not in amogus:
-        start(message)
-    elif not check_settings(message):
+    if not check_settings(message):
         pass
     else:
         try:

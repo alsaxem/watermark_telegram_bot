@@ -263,16 +263,13 @@ def handle_docs_photo(message):
 
 
 def get_photo_id(message):
-    try:
-        return message.photo[len(message.photo) - 1].file_id
-    except Exception:
-        try:
-            if message.document.file_name.split('.')[-1] in photo_extensions:
-                return message.document.file_id
-            else:
-                return empty_value
-        except Exception:
-            return empty_value
+    photo_id = empty_value
+    if message.photo is not None:
+        photo_id = message.photo[len(message.photo) - 1].file_id
+    elif message.document is not None:
+        if message.document.file_name.split('.')[-1] in photo_extensions:
+            photo_id = message.document.file_id
+    return photo_id
 
 
 def download_photo(file_id):

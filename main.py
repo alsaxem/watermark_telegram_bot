@@ -187,9 +187,8 @@ def check_settings(message):
     user_data = amogus[message.chat.id]
     if message.chat.id not in amogus:
         start(message)
-    elif empty_value in list(user_data.values())[:-2] or \
-            user_data["position"] == "FILLING" and user_data["angle"] == empty_value or \
-            user_data["position"] not in position_values[-2:] and user_data["padding"] == empty_value:
+    elif empty_value in list(user_data.values())[:-1] or \
+            user_data["position"] != "FILLING" and user_data["padding"] == empty_value:
         add_parameters(message)
     else:
         return True

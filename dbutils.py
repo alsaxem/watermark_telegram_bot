@@ -2,7 +2,7 @@ import sqlite3
 
 db_name = "bot.db"
 
-conn = sqlite3.connect(database=db_name)
+conn = sqlite3.connect(database=db_name, check_same_thread=False)
 c = conn.cursor()
 
 

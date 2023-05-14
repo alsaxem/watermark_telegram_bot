@@ -150,10 +150,10 @@ def get_reply_keyboard():
     return keyboard
 
 
-def process_photo(photo_path, watermark_path, user_id):
+def process_photo(photo_bytearray, watermark_path, user_id):
     if amogus[user_id]["position"] == "FILLING":
         photo_bytearray = create_image_with_watermark_tiling(
-            image_bytearray=photo_path,
+            image_bytearray=photo_bytearray,
             watermark_bytearray=watermark_path,
             scale=amogus[user_id]["scale"],
             angle=amogus[user_id]["angle"],
@@ -161,7 +161,7 @@ def process_photo(photo_path, watermark_path, user_id):
         )
     else:
         photo_bytearray = create_image_with_positional_watermark(
-            image_bytearray=photo_path,
+            image_bytearray=photo_bytearray,
             watermark_bytearray=watermark_path,
             position=amogus[user_id]["position"],
             scale=amogus[user_id]["scale"],

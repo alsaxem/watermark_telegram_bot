@@ -47,4 +47,3 @@ def update_info(user_id, column, value):
         value = "\"" + value + "\""
     c.execute("UPDATE users SET " + column + "=" + value + " WHERE user_id = " + str(user_id))
     conn.commit()
-

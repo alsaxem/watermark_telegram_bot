@@ -184,7 +184,7 @@ def check_settings(message):
     if not dbutils.is_user_exist(message.chat.id):
         start(message)
     elif empty_value in user_data[:-1] or \
-            user_data[1] != "FILLING" and user_data[-1] == empty_value:
+            user_data[1] == "FILLING" and user_data[-1] == empty_value:
         add_parameters(message)
     else:
         return True

@@ -18,17 +18,17 @@ class WatermarkEmbedder:
 
     def from_files(self, image_path, watermark_path, store_watermark_copy=True):
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-        self.image = add_missing_alpha(image)
+        self.image = normalize_colorspace(image)
         watermark = cv2.imread(watermark_path, cv2.IMREAD_UNCHANGED)
-        self.watermark = add_missing_alpha(watermark)
+        self.watermark = normalize_colorspace(watermark)
         if store_watermark_copy:
             self.original_watermark = np.copy(self.watermark)
 
     def from_bytearrays(self, image_bytearray, watermark_bytearray, store_watermark_copy=True):
         image = cv2.imdecode(np.frombuffer(image_bytearray, np.uint8), cv2.IMREAD_UNCHANGED)
-        self.image = add_missing_alpha(image)
+        self.image = normalize_colorspace(image)
         watermark = cv2.imdecode(np.frombuffer(watermark_bytearray, np.uint8), cv2.IMREAD_UNCHANGED)
-        self.watermark = add_missing_alpha(watermark)
+        self.watermark = normalize_colorspace(watermark)
         if store_watermark_copy:
             self.original_watermark = np.copy(self.watermark)
 

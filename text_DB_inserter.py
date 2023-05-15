@@ -1,5 +1,5 @@
 import sqlite3
-from config import db_name
+from config import db_name, dictionary_name
 
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
@@ -22,11 +22,33 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS text_languages
 
 
 languages = ['en', 'ua', 'ru']
-texts = [
-    {'title': 'hello', 'content': {'en': 'Welcome.\nBot will help you protect your image with a watermark.', 'ua': 'Ласкаво просимо.\nБот допоможе вам захистити зображення водяним знаком.', 'ru': 'Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком.'}},
 
-]
 
+def parse_data(file_name):
+    with open(file_name, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+
+    data = []
+    current_entry = {}
+
+    for line in lines:
+        line = line.strip()
+
+        if line.startswith('title:'):
+            current_entry['title'] = line.split(':', 1)[1].strip()
+        elif line.startswith('content:'):
+            current_entry['content'] = {}
+        elif line:
+            lang, text = line.split(':', 1)
+            current_entry['content'][lang.strip()] = text.strip()
+        else:
+            data.append(current_entry)
+            current_entry = {}
+
+    return data
+
+
+texts = parse_data(dictionary_name)
 
 for text in texts:
     cursor.execute('SELECT id FROM texts WHERE title = ?', (text['title'],))

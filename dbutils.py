@@ -70,4 +70,10 @@ def is_user_exist(user_id):
     return bool(get_fields_info(user_id, "user_id"))
 
 
+def get_text(summary, language):
+    with lock:
+        c.execute("SELECT " + language + " FROM messages WHERE summary=?", (summary,))
+        return c.fetchone()[0]
+
+
 create_users_table()

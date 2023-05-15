@@ -70,6 +70,7 @@ def set_watermark_photo(message):
             bot.send_message(chat_id=message.chat.id, text=text)
         add_parameters(message)
     except Exception as e:
+        print("ERROR: set_watermark_photo")
         print(e)
         process_exception(message)
         bot.register_next_step_handler(message, request_watermark_photo)
@@ -80,6 +81,7 @@ def set_position(call):
     try:
         set_parameter(call.message, column="position", data=call.data)
     except Exception as e:
+        print("ERROR: set_position")
         print(e)
         process_exception(call.message)
         bot.register_next_step_handler(call.message, request_watermark_position)
@@ -90,6 +92,7 @@ def set_scale(call):
     try:
         set_parameter(call.message, column="scale", data=float(call.data[1:]))
     except Exception as e:
+        print("ERROR: set_scale")
         print(e)
         process_exception(call.message)
         bot.register_next_step_handler(call.message, request_scale)
@@ -100,6 +103,7 @@ def set_opacity(call):
     try:
         set_parameter(call.message, column="opacity", data=float(call.data))
     except Exception as e:
+        print("ERROR: set_opacity")
         print(e)
         process_exception(call.message)
         bot.register_next_step_handler(call.message, request_opacity)
@@ -110,6 +114,7 @@ def set_padding(call):
     try:
         set_parameter(call.message, column="padding", data=float(call.data[:-1]) / 100)
     except Exception as e:
+        print("ERROR: set_padding")
         print(e)
         process_exception(call.message)
         bot.register_next_step_handler(call.message, request_padding)
@@ -119,6 +124,7 @@ def set_angle(message):
     try:
         set_parameter(message, column="angle", data=int(message.text), is_remove=False)
     except Exception as e:
+        print("ERROR: set_angle")
         print(e)
         process_exception(message)
         bot.register_next_step_handler(message, request_angle)

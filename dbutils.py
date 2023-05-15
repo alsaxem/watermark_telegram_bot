@@ -70,10 +70,22 @@ def is_user_exist(user_id):
     return bool(get_fields_info(user_id, "user_id"))
 
 
-def get_text(summary, language):
+def get_text(title, user_id):
     with lock:
-        c.execute("SELECT " + language + " FROM messages WHERE summary=?", (summary,))
-        return c.fetchone()[0]
+        c.execute('''SELECT tl.content
+                    FROM texts AS t
+                    INNER JOIN text_languages AS tl ON t.id = tl.text_id
+                    INNER JOIN languages AS l ON tl.lang_id = l.id
+                    WHERE t.title = ? AND l.name = 
+                    (SELECT language FROM users WHERE user_id = ?)''', (title, user_id))
+
+        result = c.fetchone()
+
+    if result:
+        content = result[0]
+    else:
+        content = "Text not found."
+    return content
 
 
 create_users_table()

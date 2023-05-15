@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import cv2
 
 
 def get_diagonal(width, height):
@@ -64,6 +65,8 @@ def blend(image, overlay, alpha):
 
 
 def normalize_colorspace(image):
+    if len(image.shape) < 3:
+        image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
     if image.shape[2] == 3:
         alpha = np.expand_dims(np.ones(image.shape[:2]), 2) * 255
         image = np.concatenate([image, alpha], axis=2)

@@ -63,7 +63,7 @@ def blend(image, overlay, alpha):
     return np.concatenate([blend_color, blend_alpha], axis=2) * 255
 
 
-def add_missing_alpha(image):
+def normalize_colorspace(image):
     if image.shape[2] == 3:
         alpha = np.expand_dims(np.ones(image.shape[:2]), 2) * 255
         image = np.concatenate([image, alpha], axis=2)

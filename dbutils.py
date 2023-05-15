@@ -1,8 +1,8 @@
 import sqlite3
 import threading
+from config import db_name
 
 lock = threading.Lock()
-db_name = "bot.db"
 
 conn = sqlite3.connect(database=db_name, check_same_thread=False)
 c = conn.cursor()

@@ -1,6 +1,7 @@
 owner_id = 373733750
 photo_extensions = ["jpg", "png", "jpeg"]
 users_file_path = "users_DB.pkl"
+db_name = "bot.db"
 
 empty_value = None
 

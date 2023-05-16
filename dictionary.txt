@@ -93,3 +93,39 @@ content:
     en:Send a photo to be watermarked
     ua:Надішліть фото для накладення водяного знака
     ru:Отправьте фото для наложения водяного знака
+
+title:settings_position
+content:
+    en:Position
+    ua:Позиція
+    ru:Позиция
+
+title:settings_scale
+content:
+    en:Scale
+    ua:Масштаб
+    ru:Масштаб
+
+title:settings_opacity
+content:
+    en:Opacity
+    ua:Непрозорість
+    ru:Непрозрачность
+
+title:settings_padding
+content:
+    en:Padding
+    ua:Відступ
+    ru:Отступ
+
+title:settings_angle
+content:
+    en:Angle
+    ua:Кут
+    ru:Угол
+
+title:settings_language
+content:
+    en:Language
+    ua:Мова
+    ru:Язык

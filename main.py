@@ -225,10 +225,10 @@ def request_change_setting(user_id):
     bot.send_message(chat_id=user_id, text=text, reply_markup=keyboard())
 
 
-@bot.callback_query_handler(func=lambda call: call.data in settings)
+@bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data) in settings)
 def change_setting(call):
     bot.delete_message(call.message.chat.id, call.message.message_id)
-    dbutils.update_info(call.message.chat.id, call.data, empty_value)
+    dbutils.update_info(call.message.chat.id, dbutils.get_setting_name(call.data), empty_value)
     add_parameters(call.message)
 
 

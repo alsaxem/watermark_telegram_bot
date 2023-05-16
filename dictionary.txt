@@ -195,3 +195,21 @@ content:
     en:Filling
     ua:Заповнення
     ru:Заполнение
+
+title:language_en
+content:
+    en:English
+    ua:Англійська
+    ru:Русский
+
+title:language_ua
+content:
+    en:Ukrainian
+    ua:Українська
+    ru:Украинский
+
+title:language_ru
+content:
+    en:Russian
+    ua:Російська
+    ru:Русский

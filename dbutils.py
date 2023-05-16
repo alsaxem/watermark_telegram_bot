@@ -88,4 +88,20 @@ def get_text(title, user_id):
     return content
 
 
+def get_setting_name(text):
+    with lock:
+        c.execute('''SELECT t.title
+                    FROM texts AS t
+                    INNER JOIN text_languages AS tl ON t.id = tl.text_id
+                    WHERE tl.content = ?''', (text,))
+
+        result = c.fetchone()
+
+    if result:
+        content = result[0]
+    else:
+        content = "Text not found."
+    return content
+
+
 create_users_table()

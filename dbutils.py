@@ -52,7 +52,7 @@ def add_user(*args):
     with lock:
         c.execute("INSERT OR REPLACE INTO users (user_id, name, watermark_id, position, scale, opacity, "
                   "padding, angle, language)"
-                  "VALUES (?, ?, NULL, NULL, NULL, NULL, NULL, NULL, NULL)", args)
+                  "VALUES (?, ?, NULL, NULL, NULL, NULL, NULL, NULL, \"en\")", args)
         conn.commit()
 
 

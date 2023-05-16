@@ -1,0 +1,95 @@
+title: hello
+content:
+    en: Welcome.\nBot will help you protect your image with a watermark.
+    ua: Ласкаво просимо.\nБот допоможе вам захистити зображення водяним знаком.
+    ru: Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком.
+
+title: request_photo
+content:
+    en: Send a watermark for your future photos. You can use any image you like.
+    ua: Надішліть водяний знак для ваших майбутніх фото. Ви можете використовувати будь-яке зображення.
+    ru: Отправьте водяной знак для ваших будущих фото. Вы можете использовать любое изображение.
+
+title: request_position
+content:
+    en: Select the location of the watermark:
+    ua: Виберіть місце розташування водяного знака:
+    ru: Выберете место расположения водяного знака:
+
+title:request_scale
+content:
+    en:Select the watermark size multiplier:
+    ua:Виберіть множник розміру водяного знака:
+    ru:Выберете множитель размера водяного знака:
+
+title: request_opacity
+content:
+    en:Select the transparency of the watermark:
+    ua:Виберіть прозорість водяного знаку:
+    ru:Выберете прозрачность водяного знака:
+
+title:request_padding
+content:
+    en:Specify the indentation of the watermark from the edge of the image as a percentage:
+    ua:Вкажіть відступ водяного знака від краю зображення у відсотках:
+    ru:Укажите отступ водяного знака от края изображения в процентах:
+
+title:request_angle
+content:
+    en:Specify the angle of the watermark (an integer):
+    ua:Вкажіть кут повороту водяного знака (ціле число):
+    ru:Укажите угол поворота водяного знака (целое число):
+
+title: sign_added
+content:
+    en:Sign added
+    ua:Знак додано
+    ru:Знак добавлен
+
+title: wt_photo_only
+content:
+    en:A watermark can only be a photo!
+    ua:Водяним знаком може бути тільки фото!
+    ru:Водяным знаком может быть только фото!
+
+title:something_wrong
+content:
+    en:Something went wrong. Try again.
+    ua:Щось пішло не так. Спробуйте ще раз.
+    ru:Что-то пошло не так. Попробуйте еще раз.
+
+title:my_settings
+content:
+    en:My settings
+    ua:Мої налаштування
+    ru:Мои настройки
+
+title:change_settings
+content:
+    en:Change settings
+    ua:Змінити налаштування
+    ru:Изменить настройки
+
+title:invalid_file_type
+content:
+    en:Invalid file type
+    ua:Неприпустимий тип файлу
+    ru:Недопустимый тип файла
+
+title:parameters_specified
+content:
+    en:All parameters are specified. Send the photo you want to protect
+    ua:Усі параметри вказані. Надішліть фото, яке хочеш захистити
+    ru:Все параметры указаны. Отправьте фото, которое хочешь защитить
+
+title:select_parameter
+content:
+    en:Select the parameter you want to change:
+    ua:Виберіть параметр, який ви хочете змінити:
+    ru:Выберете параметр, который вы хотите изменить:
+
+title:send_photo
+content:
+    en:Send a photo to be watermarked
+    ua:Надішліть фото для накладення водяного знака
+    ru:Отправьте фото для наложения водяного знака

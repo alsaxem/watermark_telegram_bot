@@ -217,8 +217,11 @@ def send_settings(user_id):
 
 
 def request_change_setting(user_id):
+    items = []
+    for item in settings:
+        items.append(dbutils.get_text("setting_"+item, user_id))
     text = dbutils.get_text("select_parameter", user_id)
-    keyboard = Keyboa(items=settings, items_in_row=1)
+    keyboard = Keyboa(items=items, items_in_row=1)
     bot.send_message(chat_id=user_id, text=text, reply_markup=keyboard())
 
 

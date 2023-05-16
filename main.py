@@ -202,8 +202,8 @@ def check_settings(message):
 
 def send_settings(user_id):
     user_settings = ""
-    setting_names = ["position", "scale", "opacity", "angle", "padding"]
-    setting_values = dbutils.get_fields_info(user_id, "position, scale, opacity, angle, padding")
+    setting_names = "" + settings[1:]
+    setting_values = dbutils.get_fields_info(user_id, ", ".join(setting_names))
     if not setting_values:
         setting_values = [empty_value, empty_value, empty_value, empty_value, empty_value]
     for i in range(0, len(setting_names)):

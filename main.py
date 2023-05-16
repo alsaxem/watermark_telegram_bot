@@ -224,6 +224,13 @@ def change_setting(call):
     add_parameters(call.message)
 
 
+def get_setting_names(user_id):
+    items = []
+    for item in settings:
+        items.append(dbutils.get_text("setting_" + item, user_id))
+    return items
+
+
 def add_parameters(message):
     watermark_id, position, scale, opacity, padding, angle = dbutils.get_fields_info(message.chat.id,
                                                                                      "watermark_id, position, scale,"

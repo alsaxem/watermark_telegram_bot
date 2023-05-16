@@ -10,7 +10,7 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    text = "Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком."
+    text = dbutils.get_text("hello", message.chat.id)
     dbutils.add_user(message.chat.id, message.from_user.first_name + " " + message.from_user.last_name)
     bot.send_message(chat_id=message.chat.id, text=text)
     request_watermark_photo(message)
@@ -23,37 +23,37 @@ def sendall(message):
 
 
 def request_watermark_photo(message):
-    text = "Отправьте водяной знак для ваших будущих фото. Вы можете использовать любое изображение."
+    text = dbutils.get_text("request_photo", message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text)
     bot.register_next_step_handler(message, set_watermark_photo)
 
 
 def request_watermark_position(message):
-    text = "Выберете место расположения водяного знака:"
+    text = dbutils.get_text("request_position", message.chat.id)
     keyboard = Keyboa(items=position_values, items_in_row=3)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 
 def request_scale(message):
-    text = "Выберете множитель размера водяного знака:"
+    text = dbutils.get_text("request_scale", message.chat.id)
     keyboard = Keyboa(items=scale_values, items_in_row=5)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 
 def request_opacity(message):
-    text = "Выберете прозрачность водяного знака:"
+    text = dbutils.get_text("request_opacity", message.chat.id)
     keyboard = Keyboa(items=opacity_values, items_in_row=5)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 
 def request_padding(message):
-    text = "Укажите отступ водяного знака от края изображения в процентах:"
+    text = dbutils.get_text("request_padding", message.chat.id)
     keyboard = Keyboa(items=padding_values, items_in_row=5)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 
 def request_angle(message):
-    text = "Укажите угол поворота водяного знака (целое число):"
+    text = dbutils.get_text("request_angle", message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text)
     bot.register_next_step_handler(message, set_angle)
 
@@ -63,10 +63,10 @@ def set_watermark_photo(message):
         photo_id = get_photo_id(message)
         if photo_id != empty_value:
             dbutils.update_info(message.chat.id, "watermark_id", photo_id)
-            text = "Знак добавлен"
+            text = dbutils.get_text("sign_added", message.chat.id)
             bot.send_message(chat_id=message.chat.id, text=text)
         else:
-            text = "Водяным знаком может быть только фото!"
+            text = dbutils.get_text("wt_photo_only", message.chat.id)
             bot.send_message(chat_id=message.chat.id, text=text)
         add_parameters(message)
     except Exception as e:
@@ -138,14 +138,16 @@ def set_parameter(message, column, data, is_remove=True):
 
 
 def process_exception(message):
-    text = "Что-то пошло не так. Попробуйте еще раз."
+    text = dbutils.get_text("something_wrong", message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text)
 
 
-def get_reply_keyboard():
+def get_reply_keyboard(user_id):
     keyboard = telebot.types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
-    button1 = telebot.types.KeyboardButton('Мои настройки')
-    button2 = telebot.types.KeyboardButton('Изменить настройки')
+    text = dbutils.get_text("my_settings", user_id)
+    button1 = telebot.types.KeyboardButton(text)
+    text = dbutils.get_text("change_settings", user_id)
+    button2 = telebot.types.KeyboardButton(text)
     keyboard.add(button1, button2)
     return keyboard
 
@@ -176,13 +178,13 @@ def process_photo(photo_bytearray, watermark_bytearray, user_id):
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    if message.text == "Мои настройки":
+    if message.text == dbutils.get_text("my_settings", message.chat.id):
         send_settings(message.chat.id)
-    elif message.text == 'Изменить настройки':
+    elif message.text == dbutils.get_text("change_settings", message.chat.id):
         request_change_setting(message.chat.id)
     elif check_settings(message):
-        text = "Отправьте фото для наложения водяного знака."
-        bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
+        text = dbutils.get_text("send_photo", message.chat.id)
+        bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard(message.chat.id))
 
 
 def check_settings(message):
@@ -209,7 +211,7 @@ def send_settings(user_id):
 
 
 def request_change_setting(user_id):
-    text = "Выберете параметр, который вы хотите изменить:"
+    text = dbutils.get_text("select_parameter", user_id)
     keyboard = Keyboa(items=settings, items_in_row=1)
     bot.send_message(chat_id=user_id, text=text, reply_markup=keyboard())
 
@@ -238,8 +240,8 @@ def add_parameters(message):
     elif angle == empty_value:
         request_angle(message)
     else:
-        text = "Все параметры указаны. Отправьте фото, которое хочешь защитить"
-        bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard())
+        text = dbutils.get_text("parameters_specified", message.chat.id)
+        bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard(message.chat.id))
 
 
 @bot.message_handler(content_types=['photo'])
@@ -263,7 +265,8 @@ def handle_docs_photo(message):
     if message.document.file_name.split('.')[-1] in photo_extensions:
         handle_photo(message)
     else:
-        bot.send_message(chat_id=message.chat.id, text="Недопустимый тип файла")
+        text = dbutils.get_text("invalid_file_type", message.chat.id)
+        bot.send_message(chat_id=message.chat.id, text=text)
 
 
 def get_photo_id(message):
@@ -287,7 +290,7 @@ def send_to_all(text):
         try:
             bot.send_message(chat_id=user_id, text=text)
         except Exception as e:
-            print(f'Не удалось отправить сообщение пользователю {user_id}\n' + str(e))
+            print(f'Failed to send a message to the user {user_id}\n' + str(e))
 
 
 bot.polling(none_stop=True)

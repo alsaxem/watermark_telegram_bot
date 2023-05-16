@@ -1,5 +1,5 @@
 import sqlite3
-from config import db_name, dictionary_name
+from config import db_name, dictionary_name, languages
 
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
@@ -19,9 +19,6 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS text_languages
                    FOREIGN KEY (text_id) REFERENCES texts (id),
                    FOREIGN KEY (lang_id) REFERENCES languages (id),
                    PRIMARY KEY (text_id, lang_id))''')
-
-
-languages = ['en', 'ua', 'ru']
 
 
 def parse_data(file_name):

@@ -200,7 +200,7 @@ title:language_en
 content:
     en:English
     ua:Англійська
-    ru:Русский
+    ru:Английский
 
 title:language_ua
 content:

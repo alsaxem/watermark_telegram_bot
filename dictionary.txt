@@ -94,6 +94,12 @@ content:
     ua:Надішліть фото для накладення водяного знака
     ru:Отправьте фото для наложения водяного знака
 
+title:setting_watermark_id
+content:
+    en:Watermark
+    ua:Водяний знак
+    ru:Водяной знак
+
 title:setting_position
 content:
     en:Position

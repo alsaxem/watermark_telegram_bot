@@ -27,7 +27,7 @@ def parse_data(file_name):
     data = []
     current_entry = {}
 
-    for line in lines:
+    for line in lines + [""]:
         line = line.strip()
 
         if line.startswith('title:'):

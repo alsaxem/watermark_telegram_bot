@@ -210,6 +210,8 @@ def send_settings(user_id):
         setting_name = dbutils.get_text("setting_"+setting_names[i], user_id)
         if setting_values[i] in position_values:
             setting_value = dbutils.get_text("position_" + setting_values[i], user_id)
+        elif setting_values[i] in languages:
+            setting_value = dbutils.get_text("language_" + setting_values[i], user_id)
         else:
             setting_value = setting_values[i]
         user_settings += f"{setting_name}: {setting_value}\n"

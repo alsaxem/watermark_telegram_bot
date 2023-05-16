@@ -285,7 +285,7 @@ def download_photo(file_id):
 def send_to_all(text):
     for user_id in dbutils.get_all_users():
         try:
-            bot.send_message(chat_id=user_id, text=text, reply_markup=get_reply_keyboard())
+            bot.send_message(chat_id=user_id, text=text)
         except Exception as e:
             print(f'Не удалось отправить сообщение пользователю {user_id}\n' + str(e))
 

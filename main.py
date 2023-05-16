@@ -205,7 +205,7 @@ def send_settings(user_id):
     setting_names = "" + settings[1:]
     setting_values = dbutils.get_fields_info(user_id, ", ".join(setting_names))
     if not setting_values:
-        setting_values = [empty_value, empty_value, empty_value, empty_value, empty_value]
+        setting_values = [empty_value] * setting_names.len()
     for i in range(0, len(setting_names)):
         user_settings += f"{setting_names[i]}: {setting_values[i]}\n"
     bot.send_message(chat_id=user_id, text=user_settings)

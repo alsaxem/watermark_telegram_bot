@@ -99,6 +99,7 @@ def get_setting_name(text):
 
     if result:
         content = result[0]
+        content = content.replace("setting_", "")
     else:
         content = "Text not found."
     return content

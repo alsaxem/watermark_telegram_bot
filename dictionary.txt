@@ -129,3 +129,63 @@ content:
     en:Language
     ua:Мова
     ru:Язык
+
+title:position_TL
+content:
+    en:Top left
+    ua:Лівий верх
+    ru:Левый верх
+
+title:position_TC
+content:
+    en:Top center
+    ua:Верхній центр
+    ru:Центральный верх
+
+title:position_TR
+content:
+    en:Top right
+    ua:Правий верх
+    ru:Правый верх
+
+title:position_CL
+content:
+    en:Center left
+    ua:Лівий центр
+    ru:Левый центр
+
+title:position_CC
+content:
+    en:Center
+    ua:Центр
+    ru:Центр
+
+title:position_CR
+content:
+    en:Center right
+    ua:Правий центр
+    ru:Правый центр
+
+title:position_BL
+content:
+    en:Bottom left
+    ua:Лівий низ
+    ru:Левый низ
+
+title:position_BC
+content:
+    en:Bottom right
+    ua:Нижній центр
+    ru:Нижний центр
+
+title:position_BR
+content:
+    en:Bottom right
+    ua:Правий низ
+    ru:Правый низ
+
+title:position_FILLING
+content:
+    en:Filling
+    ua:Заповнення
+    ru:Заполнение

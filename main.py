@@ -4,6 +4,7 @@ from keyboa import Keyboa
 from config import *
 from bot_token import *
 import dbutils
+import text_DB_inserter
 
 bot = telebot.TeleBot(token)
 
@@ -293,4 +294,5 @@ def send_to_all(text):
             print(f'Failed to send a message to the user {user_id}\n' + str(e))
 
 
+text_DB_inserter.start()
 bot.polling(none_stop=True)

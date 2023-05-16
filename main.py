@@ -10,8 +10,8 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    text = dbutils.get_text("hello", message.chat.id)
     dbutils.add_user(message.chat.id, message.from_user.first_name + " " + message.from_user.last_name)
+    text = dbutils.get_text("hello", message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text)
     request_watermark_photo(message)
 

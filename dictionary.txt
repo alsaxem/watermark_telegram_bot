@@ -94,37 +94,37 @@ content:
     ua:Надішліть фото для накладення водяного знака
     ru:Отправьте фото для наложения водяного знака
 
-title:settings_position
+title:setting_position
 content:
     en:Position
     ua:Позиція
     ru:Позиция
 
-title:settings_scale
+title:setting_scale
 content:
     en:Scale
     ua:Масштаб
     ru:Масштаб
 
-title:settings_opacity
+title:setting_opacity
 content:
     en:Opacity
     ua:Непрозорість
     ru:Непрозрачность
 
-title:settings_padding
+title:setting_padding
 content:
     en:Padding
     ua:Відступ
     ru:Отступ
 
-title:settings_angle
+title:setting_angle
 content:
     en:Angle
     ua:Кут
     ru:Угол
 
-title:settings_language
+title:setting_language
 content:
     en:Language
     ua:Мова

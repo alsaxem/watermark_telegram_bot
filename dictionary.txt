@@ -4,6 +4,12 @@ content:
     ua: Ласкаво просимо.\nБот допоможе вам захистити зображення водяним знаком.
     ru: Добро пожаловать.\nБот поможет вам защитить изображение водяным знаком.
 
+title: request_language
+content:
+    en: Choose the bot`s language:
+    ua: Виберіть мову бота:
+    ru: Выберите язык бота:
+
 title: request_photo
 content:
     en: Send a watermark for your future photos. You can use any image you like.

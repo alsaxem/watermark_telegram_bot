@@ -74,6 +74,13 @@ def request_angle(message):
     bot.register_next_step_handler(message, set_angle)
 
 
+@bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data, "language_") in languages)
+def set_language(call):
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    dbutils.update_info(call.message.chat.id, "language", dbutils.get_setting_name(call.data, "language_"))
+    send_start_message(call.message)
+
+
 def set_watermark_photo(message):
     try:
         photo_id = get_photo_id(message)

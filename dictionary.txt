@@ -24,21 +24,21 @@ content:
 
 title:request_scale
 content:
-    en:Select the watermark size multiplier:
-    ua:Виберіть множник розміру водяного знака:
-    ru:Выберете множитель размера водяного знака:
+    en:Select the ratio of the watermark size to the size of the protected photo:
+    ua:Виберіть співвідношення розміру водяного знака до розміру фото, що захищається:
+    ru:Выберете соотношение размера водяного знака к размеру защищаемого фото:
 
 title: request_opacity
 content:
-    en:Select the transparency of the watermark:
-    ua:Виберіть прозорість водяного знаку:
-    ru:Выберете прозрачность водяного знака:
+    en:Choose the opacity level of the watermark (the lower, the more transparent):
+    ua:Виберіть рівень непрозорості водяного знака (чим нижче, тим прозоріше):
+    ru:Выберете уровень непрозрачности водяного знака (чем ниже, тем прозрачнее):
 
 title:request_padding
 content:
-    en:Specify the indentation of the watermark from the edge of the image as a percentage:
-    ua:Вкажіть відступ водяного знака від краю зображення у відсотках:
-    ru:Укажите отступ водяного знака от края изображения в процентах:
+    en:Specify the watermark indent from the edge of the image as a number of percent of the size of the protected photo:
+    ua:Вкажіть відступ водяного знака від краю зображення у вигляді кількості відсотків від розміру фото, що захищається:
+    ru:Укажите отступ водяного знака от края изображения в виде количества процентов от размера защищаемого фото:
 
 title:request_angle
 content:
@@ -85,8 +85,8 @@ content:
 title:parameters_specified
 content:
     en:All parameters are specified. Send the photo you want to protect
-    ua:Усі параметри вказані. Надішліть фото, яке хочеш захистити
-    ru:Все параметры указаны. Отправьте фото, которое хочешь защитить
+    ua:Усі параметри вказані. Надішліть фото, яке хочете захистити
+    ru:Все параметры указаны. Отправьте фото, которое хотите защитить
 
 title:select_parameter
 content:
@@ -219,3 +219,4 @@ content:
     en:Russian
     ua:Російська
     ru:Русский
+Refactor: text correction

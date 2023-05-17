@@ -249,8 +249,12 @@ def request_change_setting(user_id):
 @bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data) in settings)
 def change_setting(call):
     bot.delete_message(call.message.chat.id, call.message.message_id)
-    dbutils.update_info(call.message.chat.id, dbutils.get_setting_name(call.data), empty_value)
-    add_parameters(call.message)
+    data = dbutils.get_setting_name(call.data)
+    if data == "language":
+        request_language(call.message)
+    else:
+        dbutils.update_info(call.message.chat.id, dbutils.get_setting_name(call.data), empty_value)
+        add_parameters(call.message)
 
 
 def get_setting_names(user_id):

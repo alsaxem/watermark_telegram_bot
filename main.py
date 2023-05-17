@@ -23,6 +23,16 @@ def sendall(message):
         send_to_all(message.text.replace("/sendall", ""))
 
 
+def request_language(message):
+    bot.delete_message(message.chat.id, message.message_id)
+    text = dbutils.get_text("request_language", message.chat.id)
+    languages_localize = []
+    for language in languages:
+        languages_localize.append(dbutils.get_text("language_"+language, message.chat.id))
+    keyboard = Keyboa(items=languages_localize)
+    bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
+
+
 def request_watermark_photo(message):
     text = dbutils.get_text("request_photo", message.chat.id)
     bot.send_message(chat_id=message.chat.id, text=text)

@@ -88,7 +88,7 @@ def get_text(title, user_id):
     return content
 
 
-def get_setting_name(text):
+def get_setting_name(text, prefix="setting_"):
     with lock:
         c.execute('''SELECT t.title
                     FROM texts AS t
@@ -99,7 +99,7 @@ def get_setting_name(text):
 
     if result:
         content = result[0]
-        content = content.replace("setting_", "")
+        content = content.replace(prefix, "")
     else:
         content = "Text not found."
     return content

@@ -12,9 +12,14 @@ bot = telebot.TeleBot(token)
 @bot.message_handler(commands=['start'])
 def start(message):
     dbutils.add_user(message.chat.id, message.from_user.first_name + " " + message.from_user.last_name)
+    request_language(message)
+
+
+def send_start_message(message):
     text = dbutils.get_text("hello", message.chat.id)
+    text = text.replace("\\n", "\n")
     bot.send_message(chat_id=message.chat.id, text=text)
-    request_watermark_photo(message)
+    add_parameters(message)
 
 
 @bot.message_handler(commands=['sendall'])

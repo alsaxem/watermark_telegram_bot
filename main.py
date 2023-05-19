@@ -45,7 +45,9 @@ def request_watermark_photo(message):
 
 def request_watermark_position(message):
     text = dbutils.get_text("request_position", message.chat.id)
-    keyboard = Keyboa(items=position_values, items_in_row=3)
+    value = dbutils.get_text("position_FILLING", message.chat.id)
+    position_prints_local = position_prints[:-1] + [value]
+    keyboard = Keyboa(items=position_prints_local, items_in_row=3)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 
@@ -98,10 +100,12 @@ def set_watermark_photo(message):
         bot.register_next_step_handler(message, request_watermark_photo)
 
 
-@bot.callback_query_handler(func=lambda call: call.data in position_values)
+@bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data, "") in position_prints)
 def set_position(call):
     try:
-        set_parameter(call.message, column="position", data=call.data)
+        value = dbutils.get_setting_name(call.data, "")
+        value = position_values[position_prints.index(value)]
+        set_parameter(call.message, column="position", data=value)
     except Exception as e:
         print("ERROR: set_position")
         print(e)

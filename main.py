@@ -29,7 +29,6 @@ def sendall(message):
 
 
 def request_language(message):
-    bot.delete_message(message.chat.id, message.message_id)
     text = dbutils.get_text("request_language", message.chat.id)
     languages_localize = []
     for language in languages:

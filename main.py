@@ -97,7 +97,7 @@ def set_watermark_photo(message):
         print("ERROR: set_watermark_photo")
         print(e)
         process_exception(message)
-        bot.register_next_step_handler(message, request_watermark_photo)
+        request_watermark_photo(message)
 
 
 @bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data, "") in position_prints)

@@ -214,7 +214,7 @@ def process_photo(photo_bytearray, watermark_bytearray, user_id):
             scale=scale,
             angle=angle,
             opacity=opacity,
-            add_noise=True
+            add_noise=noise
         )
     else:
         photo_bytearray = create_image_with_positional_watermark(
@@ -225,7 +225,7 @@ def process_photo(photo_bytearray, watermark_bytearray, user_id):
             angle=angle,
             opacity=opacity,
             relative_padding=padding,
-            add_noise=True
+            add_noise=noise
         )
     return photo_bytearray
 

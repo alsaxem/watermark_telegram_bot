@@ -69,5 +69,6 @@ def normalize_colorspace(image):
         image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
     if image.shape[2] == 3:
         alpha = np.expand_dims(np.ones(image.shape[:2]), 2) * 255
+        alpha = alpha.astype(np.uint8)
         image = np.concatenate([image, alpha], axis=2)
     return image

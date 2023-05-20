@@ -225,4 +225,9 @@ content:
     en:Russian
     ua:Російська
     ru:Русский
-Refactor: text correction
+
+title:None
+content:
+    en:Undefined
+    ua:Не визначено
+    ru:Не определено

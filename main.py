@@ -188,6 +188,7 @@ def process_photo(photo_bytearray, watermark_bytearray, user_id):
             scale=scale,
             angle=angle,
             opacity=opacity,
+            add_noise=True
         )
     else:
         photo_bytearray = create_image_with_positional_watermark(
@@ -198,6 +199,7 @@ def process_photo(photo_bytearray, watermark_bytearray, user_id):
             angle=angle,
             opacity=opacity,
             relative_padding=padding,
+            add_noise=True
         )
     return photo_bytearray
 
@@ -237,6 +239,8 @@ def send_settings(user_id):
             setting_value = dbutils.get_text("position_" + setting_values[i], user_id)
         elif setting_values[i] in languages:
             setting_value = dbutils.get_text("language_" + setting_values[i], user_id)
+        elif setting_values[i] == empty_value:
+            setting_value = dbutils.get_text(str(setting_values[i]), user_id)
         else:
             setting_value = setting_values[i]
         user_settings += f"{setting_name}: {setting_value}\n"

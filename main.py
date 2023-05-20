@@ -162,7 +162,7 @@ def set_angle(message):
         print("ERROR: set_angle")
         print(e)
         process_exception(message)
-        bot.register_next_step_handler(message, request_angle)
+        request_angle(message)
 
 
 @bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data, "") in noise_values)

@@ -266,7 +266,7 @@ def send_settings(user_id):
             setting_value = dbutils.get_text("position_" + setting_values[i], user_id)
         elif setting_values[i] in languages:
             setting_value = dbutils.get_text("language_" + setting_values[i], user_id)
-        elif setting_values[i] == empty_value:
+        elif setting_values[i] in noise_values + [empty_value]:
             setting_value = dbutils.get_text(str(setting_values[i]), user_id)
         else:
             setting_value = setting_values[i]

@@ -142,6 +142,12 @@ content:
     ua:Мова
     ru:Язык
 
+title:setting_noise
+content:
+    en:White noise
+    ua:Білий шум
+    ru:Белый шум
+
 title:position_TL
 content:
     en:Top left

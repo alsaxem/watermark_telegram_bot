@@ -243,3 +243,9 @@ content:
     en:Yes
     ua:Так
     ru:Да
+
+title:False
+content:
+    en:No
+    ua:Ні
+    ru:Нет

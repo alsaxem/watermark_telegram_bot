@@ -7,7 +7,7 @@ dictionary_name = "dictionary.txt"
 empty_value = None
 
 languages = ['en', 'ua', 'ru']
-settings = ["watermark_id", "position", "scale", "opacity", "padding", "angle", "language", "noise"]
+settings = ["watermark_id", "position", "scale", "opacity", "padding", "angle", "noise", "language"]
 position_values = ["TL", "TC", "TR", "CL", "CC", "CR", "BL", "BC", "BR", "FILLING"]
 position_prints = ["↖", "⬆", "↗", "⬅", "⏺", "➡", "↙", "⬇", "↘", "position_FILLING"]
 scale_values = ["x0.1", "x0.2", "x0.3", "x0.4", "x0.5", "x0.6", "x0.7", "x0.8", "x0.9", "x1.0"]

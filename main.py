@@ -77,7 +77,10 @@ def request_angle(message):
 
 def request_noise(message):
     text = dbutils.get_text("request_noise", message.chat.id)
-    keyboard = Keyboa(items=padding_values)
+    text = text.replace("\\n", "\n")
+    values = [dbutils.get_text("True", message.chat.id)]
+    values += [dbutils.get_text("False", message.chat.id)]
+    keyboard = Keyboa(items=values, items_in_row=2)
     bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
 
 

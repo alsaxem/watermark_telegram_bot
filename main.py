@@ -243,7 +243,7 @@ def handle_text(message):
 
 def check_settings(message):
     user_data = dbutils.get_fields_info(message.chat.id,
-                                        "watermark_id, position, scale, opacity, angle, padding, noise")
+                                        "watermark_id, position, scale, opacity, angle, noise, padding")
     if not dbutils.is_user_exist(message.chat.id):
         start(message)
     elif empty_value in user_data[:-1] or \

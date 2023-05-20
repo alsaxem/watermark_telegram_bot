@@ -94,6 +94,16 @@ class WatermarkEmbedder:
         marked_region_of_interest = blend(region_of_interest, self.watermark, opacity)
         self.marked_image = paste(self.image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
 
+    def apply_noise_to_watermark(self, intensity=0.7, opacity=1):
+        mean = np.zeros((4,), np.uint8)
+        standard_deviation = np.empty((4,), np.uint8)
+        standard_deviation.fill(intensity * 255)
+        noise = np.zeros(self.watermark.shape, np.uint8)
+        cv2.randn(noise, mean, standard_deviation)
+        alpha_filter = (self.watermark[:, :, 3] > 0).astype(np.uint8)
+        noise[:, :, 3] = noise[:, :, 3] * alpha_filter
+        self.watermark = blend(self.watermark, noise, opacity)
+
     def save_to_file(self, save_path):
         cv2.imwrite(save_path, self.marked_image)
 

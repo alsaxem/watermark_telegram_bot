@@ -299,9 +299,10 @@ def get_setting_names(user_id):
 
 
 def add_parameters(message):
-    watermark_id, position, scale, opacity, padding, angle = dbutils.get_fields_info(message.chat.id,
-                                                                                     "watermark_id, position, scale,"
-                                                                                     "opacity, padding, angle")
+    watermark_id, position, scale, opacity, padding, angle, noise = dbutils.get_fields_info(message.chat.id,
+                                                                                            "watermark_id, position, "
+                                                                                            "scale, opacity, padding, "
+                                                                                            "angle, noise")
     if watermark_id == empty_value:
         request_watermark_photo(message)
     elif position == empty_value:
@@ -314,6 +315,8 @@ def add_parameters(message):
         request_padding(message)
     elif angle == empty_value:
         request_angle(message)
+    elif noise == empty_value:
+        request_noise(message)
     else:
         text = dbutils.get_text("parameters_specified", message.chat.id)
         bot.send_message(chat_id=message.chat.id, text=text, reply_markup=get_reply_keyboard(message.chat.id))

@@ -46,6 +46,12 @@ content:
     ua:Вкажіть кут повороту водяного знака (ціле число):
     ru:Укажите угол поворота водяного знака (целое число):
 
+title:request_noise
+content:
+    en:Adding white noise can make it difficult for intruders to automatically remove the watermark from the photo. White noise also changes the appearance of the watermark.nUse white noise?
+    ua:Додавання білого шуму може ускладнити автоматичне видалення водяного знака з фото зловмисниками. Також білий шум змінює зовнішній вигляд водяного знака.\nВикористовувати білий шум?
+    ru:Добавление белого шума может усложнить автоматическое удаление водяного знака с фото злоумышленниками. Также белый шум изменяет внешний вид водяного знака.\nИспользовать белый шум?
+
 title: sign_added
 content:
     en:Sign added

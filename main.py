@@ -165,6 +165,18 @@ def set_angle(message):
         bot.register_next_step_handler(message, request_angle)
 
 
+@bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data, "") in noise_values)
+def set_noise(call):
+    try:
+        value = dbutils.get_setting_name(call.data, "")
+        set_parameter(call.message, column="noise", data=value)
+    except Exception as e:
+        print("ERROR: set_scale")
+        print(e)
+        process_exception(call.message)
+        request_noise(call.message)
+
+
 def set_parameter(message, column, data, is_remove=True):
     if is_remove:
         bot.delete_message(message.chat.id, message.message_id)

@@ -1,6 +1,6 @@
 import sqlite3
 import threading
-from config import db_name
+from config import db_name, languages
 
 lock = threading.Lock()
 
@@ -84,7 +84,12 @@ def get_text(title, user_id):
     if result:
         content = result[0]
     else:
-        content = "Text not found."
+        lang = get_fields_info(user_id, "language")
+        if lang in languages:
+            content = "Text not found."
+        else:
+            update_info(user_id, column="language", value="en")
+            content = get_text(title, user_id)
     return content
 
 

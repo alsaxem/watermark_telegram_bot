@@ -200,8 +200,13 @@ def get_reply_keyboard(user_id):
 
 
 def process_photo(photo_bytearray, watermark_bytearray, user_id):
-    position, scale, opacity, padding, angle = dbutils.get_fields_info(user_id,
-                                                                       "position, scale, opacity, padding, angle")
+    position, scale, opacity, padding, angle, noise = dbutils.get_fields_info(user_id,
+                                                                              "position, scale, opacity, padding, "
+                                                                              "angle, noise")
+    if noise == "True":
+        noise = True
+    else:
+        noise = False
     if position == "FILLING":
         photo_bytearray = create_image_with_watermark_tiling(
             image_bytearray=photo_bytearray,

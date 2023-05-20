@@ -106,7 +106,7 @@ def get_setting_name(text, prefix="setting_"):
         content = result[0]
         content = content.replace(prefix, "")
     else:
-        content = "Text not found."
+        content = text
     return content
 
 

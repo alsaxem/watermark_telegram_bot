@@ -84,13 +84,15 @@ def get_text(title, user_id):
 
     if result:
         content = result[0]
-    else:
+    elif is_user_exist(user_id):
         lang = get_fields_info(user_id, "language")
         if lang in languages:
             content = "Text not found."
         else:
             update_info(user_id, column="language", value="en")
             content = get_text(title, user_id)
+    else:
+        content = "User not found. Type /start"
     return content
 
 

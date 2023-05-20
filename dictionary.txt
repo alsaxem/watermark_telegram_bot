@@ -237,3 +237,9 @@ content:
     en:Undefined
     ua:Не визначено
     ru:Не определено
+
+title:True
+content:
+    en:Yes
+    ua:Так
+    ru:Да

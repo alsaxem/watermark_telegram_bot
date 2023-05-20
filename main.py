@@ -75,6 +75,12 @@ def request_angle(message):
     bot.register_next_step_handler(message, set_angle)
 
 
+def request_noise(message):
+    text = dbutils.get_text("request_noise", message.chat.id)
+    keyboard = Keyboa(items=padding_values)
+    bot.send_message(chat_id=message.chat.id, text=text, reply_markup=keyboard())
+
+
 @bot.callback_query_handler(func=lambda call: dbutils.get_setting_name(call.data, "language_") in languages)
 def set_language(call):
     bot.delete_message(call.message.chat.id, call.message.message_id)

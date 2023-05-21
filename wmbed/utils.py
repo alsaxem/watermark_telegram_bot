@@ -107,7 +107,6 @@ def blend(image, overlay, alpha):
     blend_color = np.divide(
         overlay_alpha * overlay_color + (1 - overlay_alpha) * image_alpha * image_color,
         blend_alpha,
-        out=np.zeros_like(overlay_color),
         where=(blend_alpha != 0))
     return np.concatenate([blend_color, blend_alpha], axis=2) * 255
 

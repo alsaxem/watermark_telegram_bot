@@ -7,26 +7,38 @@ def get_diagonal(width, height):
     return math.sqrt(width ** 2 + height ** 2)
 
 
-def get_positional_bounds(image_size, watermark_size, position, padding):
+def get_positional_bounds(image_size, watermark_size, position, relative_padding):
     image_width, image_height = image_size
     watermark_width, watermark_height = watermark_size
     vertical_position = position[0]
     horizontal_position = position[1]
+    max_padding_x = image_width - watermark_width
+    max_padding_y = image_height - watermark_height
+    padding_y = int(max_padding_y * relative_padding)
+    padding_x = int(max_padding_x * relative_padding)
     horizontal_bounds = ()
     vertical_bounds = ()
     if vertical_position == "T":
-        vertical_bounds = (max(padding, 0), min(watermark_height + padding, image_height))
+        top_bound = max(padding_y, 0)
+        bottom_bound = min(watermark_height + padding_y, image_height)
+        vertical_bounds = (top_bound, bottom_bound)
     elif vertical_position == "B":
-        vertical_bounds = (max(image_height - watermark_height - padding, 0), min(image_height - padding, image_height))
+        top_bound = max(image_height - watermark_height - padding_y, 0)
+        bottom_bound = min(image_height - padding_y, image_height)
+        vertical_bounds = (top_bound, bottom_bound)
     elif vertical_position == "C":
         image_center_y = image_height // 2
         top_bound = max(image_center_y - watermark_height // 2, 0)
         bottom_bound = min(top_bound + watermark_height, image_height)
         vertical_bounds = (top_bound, bottom_bound)
     if horizontal_position == "L":
-        horizontal_bounds = (max(padding, 0), min(watermark_width + padding, image_width))
+        left_bound = max(padding_x, 0)
+        right_bound = min(watermark_width + padding_x, image_width)
+        horizontal_bounds = (left_bound, right_bound)
     elif horizontal_position == "R":
-        horizontal_bounds = (max(image_width - watermark_width - padding, 0), min(image_width - padding, image_width))
+        left_bound = max(image_width - watermark_width - padding_x, 0)
+        right_bound = min(image_width - padding_x, image_width)
+        horizontal_bounds = (left_bound, right_bound)
     elif horizontal_position == "C":
         image_center_x = image_width // 2
         left_bound = max(image_center_x - watermark_width // 2, 0)

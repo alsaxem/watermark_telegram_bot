@@ -51,10 +51,8 @@ class WatermarkEmbedder:
             self.rotate_watermark(angle)
         self.scale_watermark(scale)
         watermark_width, watermark_height = self.get_watermark_size()
-        padding_limit = min(image_width - watermark_width, image_height - watermark_height)
-        padding = int(padding_limit * relative_padding)
         horizontal_bounds, vertical_bounds = get_positional_bounds(
-            (image_width, image_height), (watermark_width, watermark_height), position, padding)
+            (image_width, image_height), (watermark_width, watermark_height), position, relative_padding)
         self.embed(horizontal_bounds, vertical_bounds, opacity)
 
     def rotate_watermark(self, angle):

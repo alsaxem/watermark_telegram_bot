@@ -1,4 +1,3 @@
-import cv2
 from .utils import *
 
 
@@ -37,51 +36,30 @@ class WatermarkEmbedder:
             self.watermark = self.original_watermark
 
     def scale_watermark(self, relative_scale):
-        watermark_width, watermark_height = self.get_watermark_size()
-        image_width, image_height = self.get_image_size()
-        width_ratio = image_width / watermark_width
-        height_ratio = image_height / watermark_height
-        true_scale = min(width_ratio, height_ratio) * relative_scale
-        resized_dimensions = (int(watermark_width * true_scale), int(watermark_height * true_scale))
-        self.watermark = cv2.resize(self.watermark, resized_dimensions, interpolation=cv2.INTER_AREA)
+        scaled_size = get_relatively_scaled_size(self.get_watermark_size(), self.get_image_size(), relative_scale)
+        self.watermark = cv2.resize(self.watermark, scaled_size, interpolation=cv2.INTER_AREA)
 
     def embed_positional_watermark(self, position="BR", scale=1.0, angle=0, opacity=0.4, relative_padding=0):
-        image_width, image_height = self.get_image_size()
-        if angle % 360 != 0:
-            self.rotate_watermark(angle)
+        self.rotate_watermark(angle)
         self.scale_watermark(scale)
-        watermark_width, watermark_height = self.get_watermark_size()
         horizontal_bounds, vertical_bounds = get_positional_bounds(
-            (image_width, image_height), (watermark_width, watermark_height), position, relative_padding)
+            self.get_image_size(), self.get_watermark_size(), position, relative_padding)
         self.embed(horizontal_bounds, vertical_bounds, opacity)
 
     def rotate_watermark(self, angle):
-        watermark_width, watermark_height = self.get_watermark_size()
-        image_center = (watermark_width // 2, watermark_height // 2)
-        rotation_mat = cv2.getRotationMatrix2D(image_center, -angle, 1.0)
-        abs_cos = abs(rotation_mat[0, 0])
-        abs_sin = abs(rotation_mat[0, 1])
-        new_width = int(watermark_height * abs_sin + watermark_width * abs_cos)
-        new_height = int(watermark_height * abs_cos + watermark_width * abs_sin)
-        rotation_mat[0, 2] += new_width // 2 - image_center[0]
-        rotation_mat[1, 2] += new_height // 2 - image_center[1]
-        self.watermark = cv2.warpAffine(self.watermark, rotation_mat, (new_width, new_height))
+        angle = angle % 360
+        if angle == 0:
+            return
+        rotation_matrix, new_width, new_height = get_image_rotation_args(self.get_watermark_size(), angle)
+        self.watermark = cv2.warpAffine(self.watermark, rotation_matrix, (new_width, new_height))
 
     def embed_watermark_tiling(self, scale=1.0, angle=0, opacity=0.4):
-        image_width, image_height = self.get_image_size()
         self.scale_watermark(scale)
-        watermark_width, watermark_height = self.get_watermark_size()
-        tiling_size_lower_bound = round(get_diagonal(image_width, image_height))
-        tiling_width_weight = (tiling_size_lower_bound + watermark_width) // watermark_width
-        if tiling_width_weight % 2 == 0:
-            tiling_width_weight += 1
-        tiling_height_weight = (tiling_size_lower_bound + watermark_height) // watermark_height
-        if tiling_height_weight % 2 == 0:
-            tiling_height_weight += 1
+        tiling_height_weight, tiling_width_weight = get_tiling_weights(self.get_watermark_size(), self.get_image_size())
         self.watermark = np.tile(self.watermark, (tiling_height_weight, tiling_width_weight, 1))
-        if angle % 360 != 0:
-            self.rotate_watermark(angle)
+        self.rotate_watermark(angle)
         watermark_tiling_width, watermark_tiling_height = self.get_watermark_size()
+        image_width, image_height = self.get_image_size()
         horizontal_bounds, vertical_bounds = get_positional_bounds(
             (watermark_tiling_width, watermark_tiling_height), (image_width, image_height), "CC", 0)
         self.watermark = crop(self.watermark, horizontal_bounds, vertical_bounds)
@@ -93,13 +71,8 @@ class WatermarkEmbedder:
         self.marked_image = paste(self.image, marked_region_of_interest, horizontal_bounds, vertical_bounds)
 
     def apply_noise_to_watermark(self, intensity=0.7, opacity=1):
-        mean = np.zeros((4,), np.uint8)
-        standard_deviation = np.empty((4,), np.uint8)
-        standard_deviation.fill(intensity * 255)
-        noise = np.zeros(self.watermark.shape, np.uint8)
-        cv2.randn(noise, mean, standard_deviation)
         alpha_filter = (self.watermark[:, :, 3] > 0).astype(np.uint8)
-        noise[:, :, 3] = noise[:, :, 3] * alpha_filter
+        noise = get_noise(self.watermark.shape, intensity, alpha_filter)
         self.watermark = blend(self.watermark, noise, opacity)
 
     def save_to_file(self, save_path):
